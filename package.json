@@ -1,0 +1,12 @@
+{
+  "name": "exp-deploy",
+  "version": "0.0.1",
+  "description": "Simple deploy script",
+  "author": "Expressen AB",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ExpressenAB/exp-deploy.git"
+  },
+  "bin": "scripts/deploy.sh"
+}
