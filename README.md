@@ -50,6 +50,8 @@ Invoke just like any other npm script
 prompt> npm run deploy-staging
 ```
 
+#### Server override
+
 If you want to override the config and deploy to a specific server only you can do this using an extra parameter:
 
 ```
