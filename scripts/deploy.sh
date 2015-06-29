@@ -6,22 +6,6 @@ PREFIX="npm_package_config_exp_deploy_environments_"
 
 echo "==> Building $ENVIRONMENT"
 
-# Force unmodifed, master and run tests by default on production
-if [[ "$ENVIRONMENT" = "production" ]]; then
-  DEFAULT_RUN_TESTS=1
-  DEFAULT_FORCE_UNMODIFIED=1
-  DEFAULT_FORCE_MASTER=1
-fi;
-
-RUN_TESTS_VAR=${PREFIX}${ENVIRONMENT}_runTests
-RUN_TESTS=${!RUN_TESTS_VAR:-$DEFAULT_RUN_TESTS}
-
-FORCE_UNMODIFIED_VAR=${PREFIX}${ENVIRONMENT}_forceUnmodified
-FORCE_UNMODIFIED=${!FORCE_UNMODIFIED_VAR:-$DEFAULT_FORCE_UNMODIFIED}
-
-FORCE_MASTER_VAR=${PREFIX}${ENVIRONMENT}_forceMaster
-FORCE_MASTER=${!FORCE_MASTER_VAR:-$DEFAULT_FORCE_MASTER}
-
 APP_NAME_VAR=${PREFIX}name
 APP_NAME=${!APP_NAME_VAR:-$npm_package_name}
 
@@ -43,28 +27,6 @@ fi
 # Make it possible to deploy on a specific server
 if [[ -n $SERVERS_OVERRIDE ]]; then
   SERVERS=$SERVERS_OVERRIDE
-fi
-
-# Make sure all changes are committed
-if [[ $FORCE_UNMODIFIED -eq 1 ]]; then
-  if [[ $(git status --porcelain) ]]; then
-    echo "You have not committed your changes to the git repo. Please do so and run the script again."
-    exit 1
-  fi
-fi
-
-# Ensure we are on master branch before deploying to a production environment.
-BRANCH=`git rev-parse --abbrev-ref HEAD`
-if [[ $FORCE_MASTER -eq 1 && "$BRANCH" != "master" && "$DEPLOY_FROM_BRANCH" != "true" ]]; then
-  echo "Error: You must be on master branch to deploy to \"$ENVIRONMENT\""
-  echo "eSet DEPLOY_FROM_BRANCH=true to ignore this check and deploy from \"$BRANCH\""
-  exit 1
-fi
-
-# Run tests before deploying to a production environment.
-if [[ $RUNTESTS = "true" ]]; then
-  echo "==> Running tests"
-  npm test
 fi
 
 # Pack app
@@ -115,13 +77,3 @@ for server in $SERVERS; do
   waitForConnections
 done
 
-if [[ "$ENVIRONMENT" == "production" ]]; then
-  if [[ -z $SERVERS_OVERRIDE ]]; then
-    echo "Updating 'deployed' tag in git."
-    git tag -f deployed
-    git push --force origin deployed
-  fi
-
-  echo ""
-  echo "Don't forget to add a message to the #lanseringar channel in Slack about the release."
-fi
