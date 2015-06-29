@@ -38,7 +38,7 @@ Also add an entry to the scripts section for deploy tasks
 "scripts": {
   "deploy-production": "exp-deploy production",
   "deploy-staging": "exp-deploy staging",
-  "deploy-test": ""
+  "deploy-test": "exp-deploy test"
 }
 ```
 
