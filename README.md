@@ -8,6 +8,9 @@ Just add exp-deploy to your devDependencies.
 
 ## Configuration
 
+All configuration of exp-deploy is done right inside your package.json.
+
+#### Define environments
 Add an "exp-deploy" configuration to your package.json, describing your different environments:
 
 ```
@@ -29,7 +32,9 @@ Valid options are
 * ``[environment].servers`` - list of servers to deploy to.
 * ``[environment].waitForLoadbalancer`` - wait for the loadbalancer to enable a server before proceeeding with the next (defaults to "false").
 
-Also add an entry to the scripts section for deploy tasks
+#### Add deploy tasks
+
+Add entries to the scripts section for deploy tasks
 
 ```
 "scripts": {
@@ -59,7 +64,7 @@ NOTE: this requires npm version 2.0 or later.
 
 ## Hooks
 
-To define deploy hooks, simply use the pre/post feature built in to the npm script task. You can define your own scripts and/or use the ones that come with exp-deploy. 
+To define deploy hooks, we utilze the pre/post feature built in to the npm script task. You can define your own scripts and/or use the ones that come with exp-deploy. 
 
 #### Pre
 Certain environments are extra sensitive (I'm looking at you "production"...), and you want to assert that everything is just perfect before you proceed with the deployment. Exp-config provides a number of hooks that can be used for this:
