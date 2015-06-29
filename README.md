@@ -59,7 +59,7 @@ NOTE: this requires npm version 2.0 or later.
 
 ## Hooks
 
-To define pre/post deploy hooks, simply use the pre/post hooks built in to the npm script task. You can define your own scripts and/or use the ones that come with exp-deploy. 
+To define deploy hooks, simply use the pre/post feature built in to the npm script task. You can define your own scripts and/or use the ones that come with exp-deploy. 
 
 #### Pre
 Certain environments are extra sensitive (I'm looking at you "production"...), and you want to assert that everything is just perfect before you proceed with the deployment. Exp-config provides a number of hooks that can be used for this:
