@@ -56,6 +56,8 @@ If you want to override the config and deploy to a specific server only you can 
 prompt> npm run deploy-production -- prod-server-1
 ```
 
+NOTE: this requires npm version 2.0 or later.
+
 ## Hooks
 
 To add hooks for app-specific stuff, just use the pre/post hooks built into npm run (https://docs.npmjs.com/misc/scripts).
