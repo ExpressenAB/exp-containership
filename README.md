@@ -56,4 +56,15 @@ If you want to override the config and deploy to a specific server only you can 
 prompt> npm run deploy-production -- prod-server-1
 ```
 
+## Hooks
+
+To add hooks for app-specific stuff, just use the pre/post hooks built into npm run (https://docs.npmjs.com/misc/scripts).
+
+```
+"scripts": {
+  "deploy-production": "exp-deploy production",
+  "predeploy-prodction": "scripts/ensure-service-window-open.sh"
+  "postdeploy-production": "scripts/send-message-to-slack.sh"
+}
+```
 
