@@ -1,6 +1,12 @@
 # exp-deploy
 
-Simple deployment handling using the npm script feature. Works fine on OSX and Linux, most likely not on Windows.
+Simple deployment handling using the npm script feature.
+
+## Requirements
+
+* Linux or OSX
+* Applications are managed with pm2 and a ``config/pm2.json`` file must be present.
+* Passwordless ssh access to ``web`` user is required to all servers.
 
 ## Installation
 
