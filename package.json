@@ -10,8 +10,8 @@
   },
   "bin": {
     "exp-deploy": "scripts/deploy.sh",
-    "exp-deploy-ensure-unmodified": "scripts/exp-deploy-ensure-unmodified.sh",
-    "exp-deploy-ensure-master": "scripts/exp-deploy-ensure-master.sh",
-    "exp-deploy-set-tag": "scripts/exp-deploy-set-tag.sh"
+    "exp-ensure-unmodified": "scripts/ensure-unmodified.sh",
+    "exp-ensure-master": "scripts/ensure-master.sh",
+    "exp-set-tag": "scripts/set-tag.sh"
   }
 }

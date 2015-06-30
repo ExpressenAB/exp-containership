@@ -48,17 +48,13 @@ Add entries to the scripts section to define your deployment tasks.
 
 Invoke just like any other npm script
 
-```
-prompt> npm run deploy-staging
-```
+```prompt> npm run deploy-staging```
 
 #### Server override
 
 If you want to override the config and deploy to a specific server, set the EXP_DEPLOY_SERVERS variable.
 
-```
-prompt> EXP_DEPLOY_SERVERS="prod-server-3" npm run deploy-production
-```
+```prompt> EXP_DEPLOY_SERVERS="prod-server-3" npm run deploy-production```
 
 ## Hooks
 
@@ -66,13 +62,13 @@ To define deploy hooks, we utilze the pre/post feature built into the npm script
 
 #### Pre
 
-* ``exp-deploy-ensure-unmodified`` - ensures that everything is commited to git
-* ``exp-deploy-ensure-master`` - ensure that we deploy only from the master branch.
-* ``exp-deploy-version-bumped`` - ensure that the version number in package.json is bumped before deploy.
+* ``exp-ensure-unmodified`` - ensures that everything is commited to git
+* ``exp-ensure-master`` - ensure that we deploy only from the master branch.
+* ``exp-version-bumped`` - ensure that the version number in package.json is bumped before deploy.
 
 #### Post
 
-* ``exp-deploy-set-tag`` - sets a "deployed" tag in git to keep track of what is running in production.
+* ``exp-set-tag`` - sets a "deployed" tag in git to keep track of what is running in production.
 
 #### Example
 
@@ -81,8 +77,8 @@ To define deploy hooks, we utilze the pre/post feature built into the npm script
   "deploy-test": "exp-deploy test",
   "deploy-staging": "exp-deploy staging",
   "deploy-production": "exp-deploy production",
-  "predeploy-prodction": "npm test && exp-deploy-ensure-unmodified && exp-deploy-ensure-master"
-  "postdeploy-production": "exp-deploy-set-tag && scripts/send-message-to-slack.sh"
+  "predeploy-prodction": "npm test && exp-ensure-unmodified && exp-ensure-master"
+  "postdeploy-production": "exp-set-tag && scripts/send-message-to-slack.sh"
 }
 ```
 
