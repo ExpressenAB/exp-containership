@@ -9,11 +9,9 @@ function sshAndLog {
 }
 
 function waitForLoadbalancer {
-  if [[ ${WAIT_FOR_LOADBALANACER} -eq 1 ]]; then
-    # Ideally we'd like to monitor the server here and make sure that the load
-    # balancer actually sends traffic to it. However, we'll just wait
-    # 16 seconds for now and then consider the server active.
-    echo "==> Waiting 16 seconds for load balancer..."
-    sleep 16
-  fi
+  # Ideally we'd like to monitor the server here and make sure that the load
+  # balancer actually sends traffic to it. However, we'll just wait
+  # 16 seconds for now and then consider the server active.
+  echo "==> Waiting 16 seconds for load balancer..."
+  sleep 16
 }
