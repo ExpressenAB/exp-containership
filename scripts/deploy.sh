@@ -46,12 +46,12 @@ for server in $SERVERS; do
   ssh "web@$server" "tar zx --strip-components 1 -C $RELEASE_DIR/." < "./$PACKAGE"
   sshAndLog "Ensure node version via nvm" "cd $RELEASE_DIR && nvm install"
   sshAndLog "Update npm" "cd $RELEASE_DIR && nvm use && npm prune --production && npm install --production"
+  sshAndLog "Update symlink" "ln -sfT $RELEASE_DIR $CUR_DIR"
 
   set +e
   sshAndLog "Remove 'alive' file to remove server from load balancer" "cd $CUR_DIR && rm config/alive"
   set -e
 
-  sshAndLog "Update symlink" "ln -sfT $RELEASE_DIR $CUR_DIR"
   sshAndLog "Restart service" "cd $CUR_DIR && nvm use && NODE_ENV=$ENVIRONMENT pm2 startOrRestart $CUR_DIR/config/pm2.json && pm2 save"
   sshAndLog "Cleanup" "cd /home/web/$APP_NAME/releases && ls -tr | head -n -5 | xargs --no-run-if-empty rm -r"
   waitForLoadbalancer $WAIT_FOR_LOADBALANCER
