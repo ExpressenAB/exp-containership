@@ -1,6 +1,6 @@
 # exp-deploy
 
-Simple deploy script. Works fine on OSX and Linux, most likely not on Windows.
+Simple deployment handling using the npm script feature. Works fine on OSX and Linux, most likely not on Windows.
 
 ## Installation
 
@@ -34,7 +34,7 @@ Valid options are
 
 #### Add deploy tasks
 
-Add entries to the scripts section for deploy tasks
+Add entries to the scripts section to define your deployment tasks.
 
 ```
 "scripts": {
