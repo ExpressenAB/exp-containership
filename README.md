@@ -52,9 +52,9 @@ Invoke just like any other npm script
 
 #### Server override
 
-If you want to override the config and deploy to a specific server, set the EXP_DEPLOY_SERVERS variable.
+If you want to override the config and deploy to a specific server, set the EXP_SERVERS variable.
 
-```prompt> EXP_DEPLOY_SERVERS="prod-server-3" npm run deploy-production```
+```prompt> EXP_SERVERS="prod-server-3" npm run deploy-production```
 
 ## Hooks
 

@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-IGNORE="EXP_DEPLOY_IGNORE_MASTER"
+IGNORE="EXP_IGNORE_MASTER"
 BRANCH=`git rev-parse --abbrev-ref HEAD`
 
 if [[ "$BRANCH" != "master" && ${!IGNORE} != true ]]; then

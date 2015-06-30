@@ -26,8 +26,8 @@ if [[ -z $SERVERS ]]; then
 fi
 
 # Make it possible to deploy on a specific server
-if [[ -n $EXP_DEPLOY_SERVERS ]]; then
-  SERVERS=$EXP_DEPLOY_SERVERS
+if [[ -n $EXP_SERVERS ]]; then
+  SERVERS=$EXP_SERVERS
 fi
 
 # Pack app
@@ -56,4 +56,3 @@ for server in $SERVERS; do
   sshAndLog "Cleanup" "cd /home/web/$APP_NAME/releases && ls -tr | head -n -5 | xargs --no-run-if-empty rm -r"
   waitForLoadbalancer $WAIT_FOR_LOADBALANCER
 done
-
