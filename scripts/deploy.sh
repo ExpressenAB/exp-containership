@@ -1,7 +1,8 @@
 #!/bin/bash -e
 
+source node_modules/exp-deploy/scripts/util.sh
+
 ENVIRONMENT=$1
-SERVERS_OVERRIDE=$2
 PREFIX="npm_package_config_exp_deploy_environments_"
 
 echo "==> Building $ENVIRONMENT"
@@ -9,7 +10,7 @@ echo "==> Building $ENVIRONMENT"
 APP_NAME_VAR=${PREFIX}name
 APP_NAME=${!APP_NAME_VAR:-$npm_package_name}
 
-WAIT_FOR_LOADBALANCER_VAR=${PREFIX}waitForLoadbalancer
+WAIT_FOR_LOADBALANCER_VAR=${PREFIX}{$ENVIRONMENT}_waitForLoadbalancer
 WAIT_FOR_LOADBALANCER=${!WAIT_FOR_LOADBALANCER_VAR}
 
 # Get servers from package.json config
@@ -25,33 +26,12 @@ if [[ -z $SERVERS ]]; then
 fi
 
 # Make it possible to deploy on a specific server
-if [[ -n $SERVERS_OVERRIDE ]]; then
-  SERVERS=$SERVERS_OVERRIDE
+if [[ -n $EXP_DEPLOY_SERVERS ]]; then
+  SERVERS=$EXP_DEPLOY_SERVERS
 fi
 
 # Pack app
 PACKAGE=$(npm pack | tail -1)
-
-function sshAndLog {
-  CMD_NAME=$1
-  CMD=$2
-  COLOR='\033[0;33m'
-  RESET_COLOR='\033[0m'
-  echo "==> $CMD_NAME"
-  echo -e "$COLOR$CMD$RESET_COLOR"
-  ssh "web@$server" "$CMD"
-}
-
-function waitForConnections {
-  if [[ ${WAIT_FOR_LOADBALANACER} -eq 1 ]]; then
-    # Ideally we'd like to monitor the server here and make sure that the load
-    # balancer actually sends traffic to it. However, we'll just wait
-    # 16 seconds for now and then consider the server active.
-    echo "==> Waiting 16 seconds for load balancer..."
-    sleep 16
-  fi
-}
-
 DATE=$(date "+%Y-%m-%dT%H.%M.%S")
 RELEASE_DIR="/home/web/$APP_NAME/releases/$DATE"
 CUR_DIR="/home/web/$APP_NAME/current"
@@ -74,6 +54,6 @@ for server in $SERVERS; do
   sshAndLog "Update symlink" "ln -sfT $RELEASE_DIR $CUR_DIR"
   sshAndLog "Restart service" "cd $CUR_DIR && nvm use && NODE_ENV=$ENVIRONMENT pm2 startOrRestart $CUR_DIR/config/pm2.json && pm2 save"
   sshAndLog "Cleanup" "cd /home/web/$APP_NAME/releases && ls -tr | head -n -5 | xargs --no-run-if-empty rm -r"
-  waitForConnections
+  waitForLoadbalancer $WAIT_FOR_LOADBALANCER
 done
 

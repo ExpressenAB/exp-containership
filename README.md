@@ -54,13 +54,11 @@ prompt> npm run deploy-staging
 
 #### Server override
 
-If you want to override the config and deploy to a specific server only you can do this using an extra parameter:
+If you want to override the config and deploy to a specific server, set the EXP_DEPLOY_SERVERS variable.
 
 ```
-prompt> npm run deploy-production -- prod-server-1
+prompt> EXP_DEPLOY_SERVERS="prod-server-3" npm run deploy-production
 ```
-
-NOTE: this requires npm version 2.0 or later.
 
 ## Hooks
 
