@@ -12,6 +12,7 @@
     "exp-deploy": "scripts/deploy.sh",
     "exp-ensure-unmodified": "scripts/ensure-unmodified.sh",
     "exp-ensure-master": "scripts/ensure-master.sh",
+    "exp-ensure-tests": "scripts/ensure-tests.sh",
     "exp-set-tag": "scripts/set-tag.sh"
   }
 }

@@ -64,7 +64,7 @@ To define deploy hooks, we utilze the pre/post feature built into the npm script
 
 * ``exp-ensure-unmodified`` - ensures that everything is commited to git
 * ``exp-ensure-master`` - ensure that we deploy only from the master branch.
-* ``exp-version-bumped`` - ensure that the version number in package.json is bumped before deploy.
+* ``exp-ensure-tests`` - ensure that all tests are running.
 
 #### Post
 
@@ -77,7 +77,7 @@ To define deploy hooks, we utilze the pre/post feature built into the npm script
   "deploy-test": "exp-deploy test",
   "deploy-staging": "exp-deploy staging",
   "deploy-production": "exp-deploy production",
-  "predeploy-prodction": "npm test && exp-ensure-unmodified && exp-ensure-master"
+  "predeploy-prodction": "exp-ensure-tests && exp-ensure-unmodified && exp-ensure-master"
   "postdeploy-production": "exp-set-tag && scripts/send-message-to-slack.sh"
 }
 ```
