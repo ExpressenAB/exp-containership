@@ -65,15 +65,12 @@ prompt> EXP_DEPLOY_SERVERS="prod-server-3" npm run deploy-production
 To define deploy hooks, we utilze the pre/post feature built into the npm script task. You can define your own scripts and/or use the ones that come with exp-deploy described below.
 
 #### Pre
-Certain environments are extra sensitive, and you want to assert that everything up to standrards before you proceed with the deployment. Exp-config provides a number of hooks that can be used for this:
 
 * ``exp-deploy-ensure-unmodified`` - ensures that everything is commited to git
 * ``exp-deploy-ensure-master`` - ensure that we deploy only from the master branch.
 * ``exp-deploy-version-bumped`` - ensure that the version number in package.json is bumped before deploy.
 
 #### Post
-
-After the deploy is done there are usually some things you want to do, exp-deploy defines the following hooks
 
 * ``exp-deploy-set-tag`` - sets a "deployed" tag in git to keep track of what is running in production.
 
