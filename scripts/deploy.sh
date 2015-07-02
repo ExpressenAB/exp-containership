@@ -54,5 +54,7 @@ for server in $SERVERS; do
 
   sshAndLog "Restart service" "cd $CUR_DIR && nvm use && NODE_ENV=$ENVIRONMENT pm2 startOrRestart $CUR_DIR/config/pm2.json && pm2 save"
   sshAndLog "Cleanup" "cd /home/web/$APP_NAME/releases && ls -tr | head -n -5 | xargs --no-run-if-empty rm -r"
-  [[ $WAIT_FOR_LOADBALANCER == true ]] && waitForLoadbalancer
+  if [[ $WAIT_FOR_LOADBALANCER == true ]] ; then
+      waitForLoadbalancer
+  fi
 done
