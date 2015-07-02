@@ -10,7 +10,9 @@ Simple deployment handling using the npm script feature.
 
 ## Installation
 
-Just add exp-deploy to your devDependencies.
+Just add exp-deploy to your ``devDependencies``.
+
+NOTE: make sure you don't use ``dependencies``, or else shrinkwrap will block the package from being installed. 
 
 ## Configuration
 
