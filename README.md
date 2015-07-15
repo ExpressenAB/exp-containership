@@ -1,54 +1,60 @@
-# exp-deploy
+# exp-containership
 
-Simple deployment handling using the npm script feature.
+Build and deploy applications as containers.
 
 ## Requirements
 
 * Linux or OSX
-* Applications are managed with pm2 and a ``config/pm2.json`` file must be present.
-* Passwordless ssh access to ``web`` user is required to all servers.
+* boot2docker installed
+* node-starterapp/docker directory
 
 ## Installation
 
-Just add exp-deploy to your ``devDependencies``.
+Just add exp-containership to your ``devDependencies``.
 
 NOTE: make sure you don't use ``dependencies``, or else shrinkwrap will block the package from being installed. 
 
 ## Configuration
 
-All configuration of exp-deploy is done right inside your package.json.
+All configuration of exp-containership is done right inside your package.json.
 
 #### Define environments
-Add an "exp-deploy" configuration to your package.json, describing your different environments:
+Add an "exp-containership" configuration to your package.json, describing your build:
 
 ```
-"config": {
-  "exp-deploy": {
-    "environments": {
-      "production": {"servers": ["prod-server-1", "prod-servgr-2"]},
-      "stage": {"servers": ["stage-server"]},
-      "test": {"servers": ["test-server"]}
+  "config": {
+    "exp-containership": {
+      "repo": "exp-docker.repo.dex.nu",
+      "production": {
+        "frontend": {
+          "port": 1234,
+          "backends": "tag.appname"
+        },
+        "instances": 4
+      }
     }
-  }
-}
+  },
 ```
 
 Valid options are
 
 * ``name`` - name to use for the app (defaults to npm package name).
-* ``environments`` - list of environments.
-* ``[environment].servers`` - list of servers to deploy to.
-* ``[environment].waitForLoadbalancer`` - wait for the loadbalancer to enable a server before proceeeding with the next (defaults to "false").
+* ``repo`` - map of repo config
+* ``[environment]frontend`` - internal loadbalancer config
+* ``[environment].frontend.port`` - listen port for the internal loadbalancer.
+* ``[environment].frontend.backends`` - the desired backend service, defaults to <environment>.<name>
+* ``[environment].instances`` - number of desired containers to start
 
-#### Add deploy tasks
+#### Add container tasks
 
-Add entries to the scripts section to define your deployment tasks.
+Add entries to the scripts section to define your container tasks.
 
 ```
 "scripts": {
-  "deploy-production": "exp-deploy production",
-  "deploy-staging": "exp-deploy staging",
-  "deploy-test": "exp-deploy test"
+  "container-build": "exp-containership build",
+  "container-push": "exp-containership push",
+  "container-deploy-production": "exp-containership deploy production",
+  "container-deploy-staging": "exp-containership deploy staging"
 }
 ```
 
@@ -56,7 +62,12 @@ Add entries to the scripts section to define your deployment tasks.
 
 Invoke just like any other npm script
 
-```prompt> npm run deploy-staging```
+- Build the container:
+```prompt> npm run container-build```
+- Push the container to the specified repo
+```prompt> npm run container-push```
+- Run the container in production
+```prompt> npm run container-deploy-production``
 
 #### Server override
 

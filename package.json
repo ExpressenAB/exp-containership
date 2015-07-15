@@ -1,18 +1,16 @@
 {
-  "name": "exp-deploy",
-  "version": "0.0.4",
-  "description": "Simple deploy script",
+  "name": "exp-containership",
+  "version": "0.0.1",
+  "description": "Build and deploy applications as containers.",
   "author": "Expressen AB",
   "license": "ISC",
   "repository": {
     "type": "git",
-      "url": "git://github.com/ExpressenAB/exp-deploy.git"
+      "url": "git://github.com/ExpressenAB/exp-containership.git"
   },
   "bin": {
-    "exp-deploy": "scripts/deploy.sh",
-    "exp-ensure-unmodified": "scripts/ensure-unmodified.sh",
-    "exp-ensure-master": "scripts/ensure-master.sh",
-    "exp-ensure-tests": "scripts/ensure-tests.sh",
-    "exp-set-tag": "scripts/set-tag.sh"
+    "exp-containership": "scripts/exp-containership.sh",
+    "docopt.py": "scripts/docopt.py",
+    "docopts.py": "scripts/docopts.py",
   }
 }
