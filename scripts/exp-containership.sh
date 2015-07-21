@@ -14,6 +14,7 @@ eval "$($_DIR/docopts.py -h "$help" -V "$version" : "$@")"
 build=0
 push=0
 deploy=0
+run=0
 for arg in "${argv[@]}"; do
     if [ "$arg" == "build" ]; then
         build=1
@@ -25,6 +26,10 @@ for arg in "${argv[@]}"; do
     	deploy=1
     	environment="${argv[1]:-production}"
     	break
+    elif [ "$arg" == "run" ]; then
+        run=1
+        environment="${argv[1]:-dev}"
+        break
     else
     	echo "Invalid argument"
     	exit 1
@@ -41,14 +46,22 @@ node_modules/*
 logs/*
 EOF
     fi
+    rm -f $npm_package_name-*.tgz
     git archive --format=tar HEAD | gzip > $npm_package_name-$_REV.tgz
 	docker build -t $npm_package_name:$_REV .
 fi
 
 if [ $push == 1 ]; then
-	echo "tagging  and pushing container"
+    echo "tagging  and pushing container"
     docker tag -f $npm_package_name:$_REV $npm_package_config_exp_containership_repo/$npm_package_name:$_REV
     docker tag -f $npm_package_name:$_REV $npm_package_config_exp_containership_repo/$npm_package_name:latest
     docker push $npm_package_config_exp_containership_repo/$npm_package_name:$_REV
     docker push $npm_package_config_exp_containership_repo/$npm_package_name:latest
+fi
+
+if [ $run == 1 ]; then
+    #VBoxManage sharedfolder add "boot2docker-vm" --name "src" --hostpath "/path/to/base/folder"
+    boot2docker ssh sudo mkdir -p /src
+    boot2docker ssh sudo mount -t vboxsf -o uid=1000,gid=50 src /src
+    docker run -it -e NODE_ENV=${environment} -v /src:/src -t -p 3000 $npm_package_name:$_REV bash
 fi

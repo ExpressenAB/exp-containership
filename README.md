@@ -53,6 +53,7 @@ Add entries to the scripts section to define your container tasks.
 "scripts": {
   "container-build": "exp-containership build",
   "container-push": "exp-containership push",
+  "container-run": "exp-containership run",
   "container-deploy-production": "exp-containership deploy production",
   "container-deploy-staging": "exp-containership deploy staging"
 }
@@ -64,16 +65,13 @@ Invoke just like any other npm script
 
 - Build the container:
 ```prompt> npm run container-build```
+- Run the container:
+```prompt> npm run container-run```
 - Push the container to the specified repo
 ```prompt> npm run container-push```
 - Run the container in production
 ```prompt> npm run container-deploy-production``
 
-#### Server override
-
-If you want to override the config and deploy to a specific server, set the EXP_SERVERS variable.
-
-```prompt> EXP_SERVERS="prod-server-3" npm run deploy-production```
 
 ## Hooks
 
@@ -93,10 +91,12 @@ To define deploy hooks, we utilze the pre/post feature built into the npm script
 
 ```
 "scripts": {
-  "deploy-test": "exp-deploy test",
-  "deploy-staging": "exp-deploy staging",
-  "deploy-production": "exp-deploy production",
-  "predeploy-prodction": "exp-ensure-tests && exp-ensure-unmodified && exp-ensure-master"
+  "container-build": "exp-containership build",
+  "container-push": "exp-containership push",
+  "container-run": "exp-containership run",
+  "container-deploy-production": "exp-containership deploy production",
+  "container-deploy-staging": "exp-containership deploy staging"
+  "predeploy-production": "exp-ensure-tests && exp-ensure-unmodified && exp-ensure-master"
   "postdeploy-production": "exp-set-tag && scripts/send-message-to-slack.sh"
 }
 ```
