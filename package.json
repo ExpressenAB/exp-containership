@@ -11,6 +11,6 @@
   "bin": {
     "exp-containership": "scripts/exp-containership.sh",
     "docopt.py": "scripts/docopt.py",
-    "docopts.py": "scripts/docopts.py",
+    "docopts.py": "scripts/docopts.py"
   }
 }

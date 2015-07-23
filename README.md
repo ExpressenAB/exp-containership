@@ -30,7 +30,11 @@ Add an "exp-containership" configuration to your package.json, describing your b
           "port": 1234,
           "backends": "tag.appname"
         },
-        "instances": 4
+        "instances": 4,
+        "helios_conf": {
+          "env": {"SERVICE_NAME":"appname", "SERVICE_TAGS": "production,commit,version"},
+          "token": "UUID",
+        }
       }
     }
   },

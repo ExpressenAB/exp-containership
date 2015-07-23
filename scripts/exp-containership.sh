@@ -36,6 +36,11 @@ for arg in "${argv[@]}"; do
     fi
 done
 
+# setup boot2docker
+if (which boot2docker); then
+    eval $(boot2docker shellinit) 2>&1 >/dev/null
+fi
+
 # build
 if [ $build == 1 ]; then
 	echo "building $npm_package_name-$_REV container"
