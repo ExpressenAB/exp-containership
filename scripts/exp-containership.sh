@@ -15,9 +15,14 @@ build=0
 push=0
 deploy=0
 run=0
+runtests=0
+prebuild=0
 for arg in "${argv[@]}"; do
     if [ "$arg" == "build" ]; then
         build=1
+        break
+    elif [ "$arg" == "prebuild" ]; then
+        prebuild=1
         break
     elif [ "$arg" == "push" ]; then
     	push=1
@@ -28,7 +33,11 @@ for arg in "${argv[@]}"; do
     	break
     elif [ "$arg" == "run" ]; then
         run=1
-        environment="${argv[1]:-dev}"
+        environment="${argv[1]:-development}"
+        break
+    elif [ "$arg" == "test" ]; then
+        runtests=1
+        environment="${argv[1]:-development}"
         break
     else
     	echo "Invalid argument"
@@ -37,8 +46,22 @@ for arg in "${argv[@]}"; do
 done
 
 # setup boot2docker
-if (which boot2docker); then
-    eval $(boot2docker shellinit) 2>&1 >/dev/null
+if (which boot2docker >/dev/null); then
+    eval $(boot2docker shellinit)
+else
+    echo "Need boot2docker to run ${0}, pelase install it and run this script again"
+    exit 1
+fi
+# prebuild
+if [ $prebuild == 1 ]; then
+
+    IGNORE="EXP_IGNORE_UNMODIFIED"
+
+    if [[ $(git status --porcelain) && ${!IGNORE} != true ]]; then
+      echo "ERROR: You have not committed all your changes to git."
+      echo "SET ${IGNORE}=true to ignore this check."
+      exit 1
+    fi
 fi
 
 # build
@@ -54,6 +77,7 @@ EOF
     rm -f $npm_package_name-*.tgz
     git archive --format=tar HEAD | gzip > $npm_package_name-$_REV.tgz
 	docker build -t $npm_package_name:$_REV .
+    rm -f $npm_package_name-*.tgz
 fi
 
 if [ $push == 1 ]; then
@@ -65,8 +89,23 @@ if [ $push == 1 ]; then
 fi
 
 if [ $run == 1 ]; then
-    #VBoxManage sharedfolder add "boot2docker-vm" --name "src" --hostpath "/path/to/base/folder"
-    boot2docker ssh sudo mkdir -p /src
-    boot2docker ssh sudo mount -t vboxsf -o uid=1000,gid=50 src /src
-    docker run -it -e NODE_ENV=${environment} -v /src:/src -t -p 3000 $npm_package_name:$_REV bash
+    VBoxManage showvminfo boot2docker-vm --machinereadable |grep SharedFolderNameMachineMapping|grep -q $npm_package_name
+    if [ $? -eq 0 ]; then
+        echo "Running $npm_package_name:$_REV bash, listening on $(boot2docker ip):3000"
+        boot2docker ssh "sudo mkdir -p /mnt/$npm_package_name && sudo mount -t vboxsf -o uid=$UID $npm_package_name /mnt/$npm_package_name"
+        docker run -it -e NODE_ENV=${environment} -v /mnt/$npm_package_name:/src -t -p 3000:3000 $npm_package_name:$_REV bash
+    else
+        echo "Need to add current folder as a host share, stopping boot2docker..."
+        boot2docker stop
+        VBoxManage sharedfolder add "boot2docker-vm" --name $npm_package_name --hostpath $(pwd) --automount > /dev/null 2>&1
+        boot2docker start
+        echo "Running $npm_package_name:$_REV bash, listening on $(boot2docker ip):3000"
+        boot2docker ssh "sudo mkdir -p /mnt/$npm_package_name && sudo mount -t vboxsf -o uid=$UID $npm_package_name /mnt/$npm_package_name"
+        docker run -it -e NODE_ENV=${environment} -v /mnt/$npm_package_name:/src -t -p 3000:3000 $npm_package_name:$_REV bash
+    fi
+fi
+
+if [ $runtests == 1 ]; then
+    echo "Running tests in container"
+    docker run -e NODE_ENV=${environment} -t -p 3000 $npm_package_name:$_REV script /dev/null -c "npm install && npm test"
 fi

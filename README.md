@@ -18,6 +18,8 @@ NOTE: make sure you don't use ``dependencies``, or else shrinkwrap will block th
 
 All configuration of exp-containership is done right inside your package.json.
 
+You will need a Dockerfile describing how to build your container. An example can be found in the node-starterapp repo.
+
 #### Define environments
 Add an "exp-containership" configuration to your package.json, describing your build:
 
@@ -55,12 +57,14 @@ Add entries to the scripts section to define your container tasks.
 
 ```
 "scripts": {
-  "container-build": "exp-containership build",
-  "container-push": "exp-containership push",
-  "container-run": "exp-containership run",
-  "container-deploy-production": "exp-containership deploy production",
-  "container-deploy-staging": "exp-containership deploy staging"
-}
+    "container-build": "exp-containership build",
+    "precontainer-build": "exp-containership prebuild",
+    "container-push": "exp-containership push",
+    "container-run": "exp-containership run",
+    "container-test": "exp-containership test",
+    "container-deploy-production": "exp-containership deploy production",
+    "container-deploy-staging": "exp-containership deploy staging"
+  },
 ```
 
 ## Running
