@@ -3,13 +3,28 @@
   "version": "0.0.1",
   "description": "Build and deploy applications as containers.",
   "author": "Expressen AB",
-  "license": "ISC",
+  "license": "proprietary",
+  "private": true,
+  "directories": {
+    "ca": "ca"
+  },
+  "dependencies": {
+    "lodash-node": "~3.10.0",
+    "colors": "^1",
+    "request": "^2",
+    "prompt": "0.2.14",
+    "cli-spinner": "0.2.1",
+    "prettyjson": "^1",
+    "consul": "^0"
+  },
   "repository": {
     "type": "git",
       "url": "git://github.com/ExpressenAB/exp-containership.git"
   },
   "bin": {
     "exp-containership": "scripts/exp-containership.sh",
+    "exp-containerdeploy": "scripts/exp-containerdeploy.js",
+    "exp-consulhelper": "scripts/exp-consulhelper.js",
     "docopt.py": "scripts/docopt.py",
     "docopts.py": "scripts/docopts.py"
   }
