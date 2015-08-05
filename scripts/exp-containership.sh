@@ -116,7 +116,7 @@ if [ $run == 1 ]; then
         boot2docker_shellinit
         echo "Running $npm_package_name:$_REV bash, listening on $(boot2docker ip):3000"
         boot2docker ssh "sudo mkdir -p /mnt/$npm_package_name && sudo mount -t vboxsf -o uid=$UID $npm_package_name /mnt/$npm_package_name"
-        docker run -it -e NODE_ENV=${environment} -v /mnt/$npm_package_name:/src -t -p 3000:3000 $npm_package_name:$_REV bash
+        docker run -it -e NODE_ENV=${environment} -e PORT=3000 -v /mnt/$npm_package_name:/src -t -p 3000:3000 $npm_package_name:$_REV bash
     else
         echo "Need to add current folder as a host share, stopping boot2docker..."
         boot2docker stop
@@ -125,14 +125,14 @@ if [ $run == 1 ]; then
         boot2docker_shellinit
         echo "Running $npm_package_name:$_REV bash, listening on $(boot2docker ip):3000"
         boot2docker ssh "sudo mkdir -p /mnt/$npm_package_name && sudo mount -t vboxsf -o uid=$UID $npm_package_name /mnt/$npm_package_name"
-        docker run -it -e NODE_ENV=${environment} -v /mnt/$npm_package_name:/src -t -p 3000:3000 $npm_package_name:$_REV bash
+        docker run -it -e NODE_ENV=${environment} -e PORT=3000 -v /mnt/$npm_package_name:/src -t -p 3000:3000 $npm_package_name:$_REV bash
     fi
 fi
 
 if [ $runtests == 1 ]; then
     boot2docker_shellinit
     echo "Running tests in container"
-    docker run -e NODE_ENV=${environment} -t -p 3000 $npm_package_name:$_REV script /dev/null -c "npm install && npm test"
+    docker run -e NODE_ENV=${environment} -e PORT=3000 -t -p 3000 $npm_package_name:$_REV script /dev/null -c "npm install && npm test"
 fi
 
 if [ $deploy == 1 ]; then

@@ -7,18 +7,23 @@ Build and deploy applications as containers.
 * Linux or OSX
 * boot2docker installed
 * node-starterapp/docker directory
+* A account on Expressens Saltmaster with ACL:s allowing to deploy.
 
 ## Installation
 
 Just add exp-containership to your ``devDependencies``.
 
-NOTE: make sure you don't use ``dependencies``, or else shrinkwrap will block the package from being installed. 
+NOTE: make sure you don't use ``dependencies``, or else shrinkwrap will block the package from being installed.
 
 ## Configuration
 
 All configuration of exp-containership is done right inside your package.json.
 
-You will need a Dockerfile describing how to build your container. An example can be found in the node-starterapp repo.
+You will need a Dockerfile describing how to build your container. An example can be found in the node-starterapp repo. The exp-containership scripts will build the container using a git-archive dump of the HEAD revision.
+
+Important configuration is the helios_jobfile and the helios_deployment_group.
+
+* helios_jobfile should be a valid job configuration file for helios (according to https://github.com/spotify/helios/blob/master/docs/user_manual.md#using-a-helios-job-config-file)
 
 #### Define environments
 Add an "exp-containership" configuration to your package.json, describing your build:
@@ -28,15 +33,8 @@ Add an "exp-containership" configuration to your package.json, describing your b
     "exp-containership": {
       "repo": "exp-docker.repo.dex.nu",
       "production": {
-        "frontend": {
-          "port": 1234,
-          "backends": "tag.appname"
-        },
-        "instances": 4,
-        "helios_conf": {
-          "env": {"SERVICE_NAME":"appname", "SERVICE_TAGS": "production,commit,version"},
-          "token": "UUID",
-        }
+        "helios_jobfile": "docker/production.job",
+        "helios_deployment_group": "jtp-production",
       }
     }
   },
@@ -63,6 +61,9 @@ Add entries to the scripts section to define your container tasks.
     "container-run": "exp-containership run",
     "container-test": "exp-containership test",
     "container-deploy-production": "exp-containership deploy production",
+    "container-undeploy-production": "exp-containership undeploy production",
+    "container-jobs-production": "exp-containership jobs production",
+    "container-status-production": "exp-containership status production",
     "container-deploy-staging": "exp-containership deploy staging"
   },
 ```

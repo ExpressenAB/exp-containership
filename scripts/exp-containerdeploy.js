@@ -24,10 +24,12 @@ var appName = process.env["npm_package_name"];
 var deployUser = process.env["USER"];
 var currDir = process.env["PWD"];
 var heliosJobFile = process.env["npm_package_config_exp_containership_production_helios_jobfile"];
+var heliosDeploymentGroup = process.env["npm_package_config_exp_containership_production_helios_deployment_group"];
 var dockerRepo = process.env["npm_package_config_exp_containership_repo"]
 
 var heliosJob = fs.readFileSync(currDir + "/" + heliosJobFile);
 var heliosJobJSON = JSON.parse(heliosJob);
+
 
 if (process.argv.length <= 4) {
     console.log("Usage: " + __filename + " ACTION ENV REV");
@@ -36,6 +38,7 @@ if (process.argv.length <= 4) {
 var action = process.argv[2];
 var environment = process.argv[3];
 var rev = process.argv[4];
+
 
 var deployJob = {
   "client": "runner",
@@ -47,7 +50,7 @@ var deployJob = {
     "token": rev,
     "image": dockerRepo + "/" + appName + ":" + rev,
     "job_def": heliosJobJSON,
-    "deploymentGroup": appName,
+    "deploymentGroup": heliosDeploymentGroup,
     "env": {
       "SERVICE_NAME": appName,
       "SERVICE_TAGS": rev + "," + environment + ";",
@@ -65,7 +68,7 @@ var undeployJob = {
     "job": appName + ":" + rev,
     "deployUser": deployUser,
     "token": rev,
-    "deploymentGroup": appName
+    "deploymentGroup": heliosDeploymentGroup
   }
 };
 
@@ -77,7 +80,7 @@ var statusJob = {
     "job": appName + ":" + rev,
     "deployUser": deployUser,
     "token": rev,
-    "deploymentGroup": appName
+    "deploymentGroup": heliosDeploymentGroup
   }
 };
 
@@ -89,7 +92,7 @@ var getJob = {
     "job": appName + ":" + rev,
     "deployUser": deployUser,
     "token": rev,
-    "deploymentGroup": appName,
+    "deploymentGroup": heliosDeploymentGroup,
     "appName": appName
   }
 };
@@ -128,9 +131,8 @@ emitter.on("get_token", function(username, password) {
     .on('response', function(response) {
       if (response.statusCode === 200) {
         token = response.headers["x-auth-token"];
-        console.log(token);
         fs.writeFileSync(tokenFile, token);
-        emitter.emit(jaction, token, heliosJobJSON);
+        emitter.emit(action, token, heliosJobJSON);
       } else {
         console.log("Unable to login, check your credentials");
         process.exit(1);
@@ -157,16 +159,23 @@ emitter.on(action, function (token, heliosJobJSON) {
       }
     spinner.stop();
     process.stdout.write('\n');
-    if (response.statusCode === 200) {
-      emitter.emit("handle_response", response, body);
-    } else {
-      spinner.stop();
-      process.stdout.write('\n');
-      fs.unlinkSync(tokenFile);
-      console.log("Unable to deploy: " + body);
-      process.exit(1);
+    switch(response.statusCode) {
+      case 200:
+        emitter.emit("handle_response", response, body);
+        break;
+      case 401:
+        spinner.stop();
+        process.stdout.write('\n');
+        fs.unlinkSync(tokenFile);
+        console.log("Unable to deploy, got code 401, trying to reauthenticate");
+        emitter.emit("prompt");
+        break;
+      default:
+        spinner.stop();
+        process.stdout.write('\n');
+        console.log("Unable to deploy, got: " + body);
+        process.exit(1);
     }
-    //console.log(JSON.parse(response));
   });
 });
 
@@ -187,6 +196,8 @@ emitter.on("handle_response", function(response, body){
   });
 });
 
+
+// main-ish
 try {
   var tokenFileStats = fs.lstatSync(tokenFile).isFile();
   token = fs.readFileSync(tokenFile);
@@ -199,7 +210,3 @@ try {
     process.exit(1);
   }
 }
-
-// helios --json create testjob:4 exp-docker.repo.dex.nu/jtp:0230154 --env SERVICE_NAME=jtp --env SERVICE_TAGS=773a89e,production,exp-exporter --env NODE_ENV=production --http-check http:/_alive -p http=3000 -u magbenex
-
-//request.post;
