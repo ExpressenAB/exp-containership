@@ -28,8 +28,8 @@ var heliosDeploymentGroup = process.env["npm_package_config_exp_containership_pr
 var dockerRepo = process.env["npm_package_config_exp_containership_repo"]
 
 var heliosJob = fs.readFileSync(currDir + "/" + heliosJobFile);
-var heliosJobJSON = JSON.parse(heliosJob);
-
+// make it base64
+var heliosJobJSON = new Buffer(heliosJob).toString("base64");
 
 if (process.argv.length <= 4) {
     console.log("Usage: " + __filename + " ACTION ENV REV");
