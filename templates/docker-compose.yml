@@ -1,0 +1,13 @@
+web:
+  build: .
+  entrypoint: /bin/bash
+  command: -c 'cd /exp-container/app && npm install && ../start.sh'
+  ports:
+    - "3000:3000"
+  environment:
+    - NODE_ENV=development
+    - DEV_APP_ENABLED=true
+    - DEV_APP_USER=web
+  volumes:
+    - ./:/exp-container/app
+    - ./tmp/node_modules:/exp-container/app/node_modules

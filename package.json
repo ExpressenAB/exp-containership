@@ -6,7 +6,8 @@
   "license": "proprietary",
   "private": true,
   "directories": {
-    "ca": "ca"
+    "ca": "ca",
+    "templates": "templates"
   },
   "dependencies": {
     "lodash-node": "~3.10.0",
