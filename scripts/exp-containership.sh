@@ -144,7 +144,7 @@ if [ $run == 1 ]; then
       open "https://www.docker.com/toolbox"
       exit 1
     fi
-    docker-compose up
+    docker-compose up 2>&1 | ${_DIR}/exp-openwatch
 fi
 
 if [ $deploy == 1 ]; then
