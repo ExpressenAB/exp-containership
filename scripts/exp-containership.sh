@@ -11,20 +11,29 @@
 #set -euf -o pipefail
 help=$(grep "^##?" "$0" | cut -c 5-)
 version=$(grep "^#?"  "$0" | cut -c 4-)
+kernel=$(uname -s)
+machine_name="exp-docker"
 _DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 _REV=$(git rev-parse --short HEAD)
 eval "$($_DIR/docopts.py -h "$help" -V "$version" : "$@")"
+init=0
+reset=0
 build=0
 push=0
 deploy=0
 run=0
-runtests=0
 prebuild=0
 status=0
 jobs=0
 undeploy=0
 for arg in "${argv[@]}"; do
-    if [ "$arg" == "build" ]; then
+    if [ "$arg" == "init" ]; then
+        init=1
+        break
+    elif [ "$arg" == "reset" ]; then
+        reset=1
+        break
+    elif [ "$arg" == "build" ]; then
         build=1
         break
     elif [ "$arg" == "prebuild" ]; then
@@ -53,10 +62,6 @@ for arg in "${argv[@]}"; do
         run=1
         environment="${argv[1]:-development}"
         break
-    elif [ "$arg" == "test" ]; then
-        runtests=1
-        environment="${argv[1]:-development}"
-        break
     else
     	echo "Invalid argument"
     	exit 1
@@ -65,16 +70,43 @@ done
 
 # setup boot2docker
 function boot2docker_shellinit {
-    if (which boot2docker >/dev/null); then
-        eval $(boot2docker shellinit)
-    else
-        echo "Need boot2docker to run ${0}, please install it and run this script again"
-        exit 1
-fi
+    if (which docker-machine >/dev/null); then
+        ls=$(docker-machine ls | grep "${machine_name}")
+        if [ -z "${ls}" ]; then
+            echo "Creating docker machine..."
+            docker-machine create --driver virtualbox "${machine_name}"
+        elif !(echo "${ls}" | grep "Running"); then
+            echo "Starting docker machine..."
+            docker-machine start "${machine_name}"
+        fi
+        eval $(docker-machine env "${machine_name}")
+    elif [ "${kernel}" != "Linux" ]; then
+      echo "Need Docker Machine to proceed, please install Docker Toolbox and run this script again"
+      open "https://www.docker.com/toolbox"
+      exit 1
+    fi
 }
+
+# reset
+if [ $reset == 1 ]; then
+    if [ "${kernel}" != "Linux" ]; then
+        if (which docker-machine >/dev/null); then
+            ls=$(docker-machine ls | grep "${machine_name}")
+            if [ -n "${ls}" ]; then
+                echo "Removing docker machine..."
+                docker-machine rm "${machine_name}"
+            fi
+        fi
+    fi
+fi
+
+# init
+if [ $init == 1 ]; then
+  boot2docker_shellinit
+fi
+
 # prebuild
 if [ $prebuild == 1 ]; then
-
     IGNORE="EXP_IGNORE_UNMODIFIED"
 
     if [[ $(git status --porcelain) && ${!IGNORE} != true ]]; then
@@ -87,52 +119,32 @@ fi
 # build
 if [ $build == 1 ]; then
     boot2docker_shellinit
-	echo "building $npm_package_name-$_REV container"
+    echo "Building container $npm_package_name:$_REV"
     #
     if [ ! -e .dockerignore ]; then
         cat <<EOF >$_DIR/.dockerignore
-node_modules/*
-logs/*
+node_modules
+logs
 EOF
     fi
-    rm -f $npm_package_name-*.tgz
-    git archive --format=tar HEAD | gzip > $npm_package_name-$_REV.tgz
-	docker build -t $npm_package_name:$_REV .
-    rm -f $npm_package_name-*.tgz
+	  docker build -t $npm_package_name:$_REV .
 fi
 
 if [ $push == 1 ]; then
     boot2docker_shellinit
-    echo "tagging  and pushing container"
+    echo "Tagging and pushing $npm_package_name:$_REV container"
     docker tag -f $npm_package_name:$_REV $npm_package_config_exp_containership_repo/$npm_package_name:$_REV
-    docker tag -f $npm_package_name:$_REV $npm_package_config_exp_containership_repo/$npm_package_name:latest
     docker push $npm_package_config_exp_containership_repo/$npm_package_name:$_REV
-    docker push $npm_package_config_exp_containership_repo/$npm_package_name:latest
 fi
 
 if [ $run == 1 ]; then
-    VBoxManage showvminfo boot2docker-vm --machinereadable |grep SharedFolderNameMachineMapping|grep -q $npm_package_name
-    if [ $? -eq 0 ]; then
-        boot2docker_shellinit
-        echo "Running $npm_package_name:$_REV bash, listening on $(boot2docker ip):3000"
-        boot2docker ssh "sudo mkdir -p /mnt/$npm_package_name && sudo mount -t vboxsf -o uid=$UID $npm_package_name /mnt/$npm_package_name"
-        docker run -it -e NODE_ENV=${environment} -e PORT=3000 -v /mnt/$npm_package_name:/src -t -p 3000:3000 $npm_package_name:$_REV bash
-    else
-        echo "Need to add current folder as a host share, stopping boot2docker..."
-        boot2docker stop
-        VBoxManage sharedfolder add "boot2docker-vm" --name $npm_package_name --hostpath $(pwd) --automount > /dev/null 2>&1
-        boot2docker start
-        boot2docker_shellinit
-        echo "Running $npm_package_name:$_REV bash, listening on $(boot2docker ip):3000"
-        boot2docker ssh "sudo mkdir -p /mnt/$npm_package_name && sudo mount -t vboxsf -o uid=$UID $npm_package_name /mnt/$npm_package_name"
-        docker run -it -e NODE_ENV=${environment} -e PORT=3000 -v /mnt/$npm_package_name:/src -t -p 3000:3000 $npm_package_name:$_REV bash
-    fi
-fi
-
-if [ $runtests == 1 ]; then
     boot2docker_shellinit
-    echo "Running tests in container"
-    docker run -e NODE_ENV=${environment} -e PORT=3000 -t -p 3000 $npm_package_name:$_REV script /dev/null -c "npm install && npm test"
+    if !(which docker-compose >/dev/null); then
+      echo "Need Docker Compose to proceed, please install Docker Toolbox and run this script again"
+      open "https://www.docker.com/toolbox"
+      exit 1
+    fi
+    docker-compose up
 fi
 
 if [ $deploy == 1 ]; then
