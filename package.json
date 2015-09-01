@@ -10,17 +10,20 @@
     "templates": "templates"
   },
   "dependencies": {
-    "lodash-node": "~3.10.0",
-    "colors": "^1",
-    "request": "^2",
-    "prompt": "0.2.14",
+    "async": "^1.4.2",
     "cli-spinner": "0.2.1",
+    "cli-table": "^0.3.1",
+    "colors": "^1",
+    "commander": "^2.8.1",
+    "consul": "^0",
+    "lodash": "^3.10.1",
     "prettyjson": "^1",
-    "consul": "^0"
+    "prompt": "0.2.14",
+    "request": "^2"
   },
   "repository": {
     "type": "git",
-      "url": "git://github.com/ExpressenAB/exp-containership.git"
+    "url": "git://github.com/ExpressenAB/exp-containership.git"
   },
   "bin": {
     "exp-containership": "scripts/exp-containership.sh",

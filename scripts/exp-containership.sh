@@ -20,12 +20,8 @@ init=1
 reset=0
 build=0
 push=0
-deploy=0
 run=0
 prebuild=0
-status=0
-jobs=0
-undeploy=0
 for arg in "${argv[@]}"; do
     if [ "$arg" == "init" ]; then
         init=1
@@ -43,22 +39,6 @@ for arg in "${argv[@]}"; do
     elif [ "$arg" == "push" ]; then
     	push=1
     	break
-    elif [ "$arg" == "deploy" ]; then
-    	deploy=1
-    	environment="${argv[1]:-production}"
-    	break
-    elif [ "$arg" == "status" ]; then
-        status=1
-        environment="${argv[1]:-production}"
-        break
-    elif [ "$arg" == "jobs" ]; then
-        jobs=1
-        environment="${argv[1]:-production}"
-        break
-    elif [ "$arg" == "undeploy" ]; then
-        undeploy=1
-        environment="${argv[1]:-production}"
-        break
     elif [ "$arg" == "run" ]; then
         run=1
         environment="${argv[1]:-development}"
@@ -146,49 +126,4 @@ if [ $run == 1 ]; then
       exit 1
     fi
     docker-compose up 2>&1 | ${_DIR}/exp-openwatch
-fi
-
-if [ $deploy == 1 ]; then
-    _IS_REV=$(git log ${argv[2]:-${_REV}} >/dev/null 2>&1)
-    if [ $? -eq 0 ]; then
-        _COMMIT_INFO=$(git log -1 --format="commit %h (%aD) by %an" ${argv[2]:-${_REV}})
-        ${_DIR}/exp-containerdeploy deploy ${environment} ${argv[2]:-${_REV}} ${_COMMIT_INFO}
-        #${_DIR}/exp-consulhelper deploy "${_COMMIT_INFO}"
-    else
-        echo "Not a valid commit."
-        exit 1
-    fi
-fi
-
-if [ $undeploy == 1 ]; then
-    _IS_REV=$(git log ${argv[2]:-${_REV}} >/dev/null 2>&1)
-    if [ $? -eq 0 ]; then
-        _COMMIT_INFO=$(git log -1 --format="commit %h (%aD) by %an" ${argv[2]:-${_REV}})
-        ${_DIR}/exp-containerdeploy undeploy ${environment} ${argv[2]:-${_REV}} ${_COMMIT_INFO}
-    else
-        echo "Not a valid commit."
-        exit 1
-    fi
-fi
-
-if [ $jobs == 1 ]; then
-    _IS_REV=$(git log ${argv[2]:-${_REV}} >/dev/null 2>&1)
-    if [ $? -eq 0 ]; then
-        _COMMIT_INFO=$(git log -1 --format="commit %h (%aD) by %an" ${argv[2]:-${_REV}})
-        ${_DIR}/exp-containerdeploy jobs ${environment} ${argv[2]:-${_REV}} ${_COMMIT_INFO}
-    else
-        echo "Not a valid commit."
-        exit 1
-    fi
-fi
-
-if [ $status == 1 ]; then
-    _IS_REV=$(git log ${argv[2]:-${_REV}} >/dev/null 2>&1)
-    if [ $? -eq 0 ]; then
-        _COMMIT_INFO=$(git log -1 --format="commit %h (%aD) by %an" ${argv[2]:-${_REV}})
-        ${_DIR}/exp-containerdeploy status ${environment} ${argv[2]:-${_REV}} ${_COMMIT_INFO}
-    else
-        echo "Not a valid commit."
-        exit 1
-    fi
 fi
