@@ -18,7 +18,7 @@ var _ = require('lodash'),
     Spinner = require('cli-spinner').Spinner,
     Table = require('cli-table');
 
-var tokenFile = '/tmp/salt-token';
+var tokenFile = process.env['HOME'] + '/.exp/salt-token';
 
 function loadRevision(cb) {
   exec('git rev-parse --short HEAD', function(err, stdout) {
@@ -26,6 +26,22 @@ function loadRevision(cb) {
       cb(err);
     } else {
       cb(null, { revision: _.trim(stdout) });
+    }
+  });
+}
+
+function deleteAuthToken (cb) {
+  fs.exists(tokenFile, function (exists) {
+    if (exists) {
+      fs.unlink(tokenFile, function (err) {
+        if (err) {
+          cb(err);
+        } else {
+          cb(null, {});
+        }
+      });
+    } else {
+      cb(null, {});
     }
   });
 }
@@ -47,7 +63,7 @@ function loadJob(state, cb) {
       }
     });
   } else {
-    cb(null, _.assign(state, { job: heliosJob }))
+    cb(null, _.assign(state, { job: heliosJob }));
   }
 }
 
@@ -79,16 +95,15 @@ function loadAuthToken (state, cb) {
 
 function login(state, cb) {
   if (_.isEmpty(state.token)) {
-    console.log('Authentication required'.cyan)
     prompt.start();
     prompt.message = '';
     prompt.delimiter = '';
     prompt.get([{
-        description: 'username:'.white,
+        description: 'Username:'.white,
         name: 'username',
         required: true
       }, {
-        description: 'password:'.white,
+        description: 'Password:'.white,
         name: 'password',
         required: true,
         hidden: true
@@ -103,7 +118,8 @@ function login(state, cb) {
               if (response.statusCode === 200) {
                 cb(null, _.assign(state, { token: response.headers['x-auth-token'] }));
               } else {
-                cb(new Error('Unable to login, check your credentials'));
+                console.log('Unable to login, check your credentials'.red);
+                login(state, cb);
               }
             })
             .on('error', cb);
@@ -115,18 +131,21 @@ function login(state, cb) {
 }
 
 function saveAuthToken(state, cb) {
-  fs.writeFile(tokenFile, state.token, function (err) {
-    if (err) {
-      cb(err);
-    } else {
-      cb(null, state);
-    }
+  var dir = path.dirname(tokenFile);
+  fs.mkdir(dir, function () {
+    fs.writeFile(tokenFile, state.token, function (err) {
+      if (err) {
+        cb(err);
+      } else {
+        cb(null, state);
+      }
+    });
   });
 }
 
 function execOrchestrate(options, cb) {
   var message = messages.randomMessage();
-  var spinner = new Spinner('Please wait — ' + message +
+  var spinner = new Spinner('Please wait -- ' + message +
         (_.endsWith(message, '?') || _.endsWith(message, '!') ? ' %s' : '... %s'));
   spinner.start();
   request({
@@ -162,9 +181,20 @@ function execOrchestrate(options, cb) {
           return v;
         }
       });
-      cb(null, _.assign(options, { body: body, results: results, response: response }));
+      cb(null, _.assign(options, {
+        body: body,
+        results: results,
+        response: response
+      }));
     } else if (response.statusCode === 401) {
-       cb(new Error('Unable to authenticate with the API'));
+      async.waterfall([deleteAuthToken, loadCaCert, login, saveAuthToken],
+        function (err, result) {
+          if (err) {
+            cb(err);
+          } else {
+            execOrchestrate(_.assign(options, { token: result.token }), cb);
+          }
+        });
     } else {
       cb(new Error('Unknown error returned by API'));
     }
