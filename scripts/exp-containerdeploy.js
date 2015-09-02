@@ -347,14 +347,13 @@ program
   });
 
 program
-  .command('deploy [group] [app] [revision]')
+  .command('deploy [revision] [app] [group]')
   .description('deploys the specified revision to an environment')
-  .action(function (group, app, rev, options) {
+  .action(function (rev, app, group, options) {
     tasks.push(function (state, cb) {
       group = group || environmentConfig('helios_deployment_group');
       app = app || process.env['npm_package_name'];
       rev = rev || state.revision;
-
       if (!group || !app || !rev) {
         return program.help();
       }
@@ -420,9 +419,9 @@ program
   });
 
 program
-  .command('undeploy [group] [app] [revision]')
+  .command('undeploy [revision] [app] [group]')
   .description('undeploys the job from the specified environment')
-  .action(function (group, app, rev, options) {
+  .action(function (rev, app, group, options) {
     tasks.push(function (state, cb) {
       group = group || environmentConfig('helios_deployment_group');
       app = app || process.env['npm_package_name'];
