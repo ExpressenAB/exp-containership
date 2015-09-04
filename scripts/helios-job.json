@@ -17,5 +17,9 @@
       "internalPort": 3000,
       "protocol": "tcp"
     }
+  },
+  "resources": {
+    "memory": 2147483648,
+    "cpuShares": 512
   }
 }
