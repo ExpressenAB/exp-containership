@@ -125,5 +125,6 @@ if [ $run == 1 ]; then
       open "https://www.docker.com/toolbox"
       exit 1
     fi
+    docker-compose build
     docker-compose up # 2>&1 | ${_DIR}/exp-openwatch
 fi
