@@ -1,4 +1,5 @@
 *.log
 *.iml
+*.tgz
 *~
 node_modules

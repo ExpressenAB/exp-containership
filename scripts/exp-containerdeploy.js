@@ -1,12 +1,9 @@
 #!/usr/bin/env node
 
 var _ = require('lodash'),
-    util = require('util'),
     fs = require('fs'),
     path = require('path'),
     colors = require('colors'),
-    prettyjson = require('prettyjson'),
-    caCertFile = path.resolve(__dirname, '../ca/salt.ca'),
     request = require('request'),
     prompt = require('prompt'),
     program = require('commander'),
@@ -68,7 +65,7 @@ function loadJob(state, cb) {
 }
 
 function loadCaCert(state, cb) {
-  fs.readFile(caCertFile, { encoding: 'utf8' }, function (err, data) {
+  fs.readFile(program.ca, { encoding: 'utf8' }, function (err, data) {
     if (err) {
       cb(err);
     } else {
@@ -461,6 +458,7 @@ program
   .option('-u, --user <user>', 'the user to impersonate', process.env['USER'])
   .option('-r, --repository <address>', 'the docker repository address', process.env['npm_package_config_exp_containership_repo'])
   .option('-j, --job <file>', 'the helios job file to deploy')
+  .option('-c, --ca <path>', 'the CA cert used to validate the API endpoint', path.resolve(__dirname, '../ca/salt.ca'))
   .parse(process.argv);
 
 if (process.argv.length <= 2) {

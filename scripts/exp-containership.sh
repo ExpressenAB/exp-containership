@@ -1,53 +1,33 @@
-#!/bin/bash
-#? exp-containership 0.1.0
+#!/bin/bash -e
 
-##? Usage: exp-containership [options] <argv>...
-##?
-##?       --help     Show help options.
-##?       --version  Print program version.
-#
-#
-#set -x
-#set -euf -o pipefail
-help=$(grep "^##?" "$0" | cut -c 5-)
-version=$(grep "^#?"  "$0" | cut -c 4-)
 kernel=$(uname -s)
 machine_name="exp-docker"
 _DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 _REV=$(git rev-parse --short HEAD)
-eval "$($_DIR/docopts.py -h "$help" -V "$version" : "$@")"
 init=1
 reset=0
 build=0
 push=0
 run=0
 prebuild=0
-for arg in "${argv[@]}"; do
-    if [ "$arg" == "init" ]; then
-        init=1
-        break
-    elif [ "$arg" == "reset" ]; then
-        init=0
-        reset=1
-        break
-    elif [ "$arg" == "build" ]; then
-        build=1
-        break
-    elif [ "$arg" == "prebuild" ]; then
-        prebuild=1
-        break
-    elif [ "$arg" == "push" ]; then
-    	push=1
-    	break
-    elif [ "$arg" == "run" ]; then
-        run=1
-        environment="${argv[1]:-development}"
-        break
-    else
-    	echo "Invalid argument"
-    	exit 1
-    fi
-done
+
+if [ "$1" == "init" ]; then
+    init=1
+elif [ "$1" == "reset" ]; then
+    init=0
+    reset=1
+elif [ "$1" == "build" ]; then
+    build=1
+elif [ "$1" == "prebuild" ]; then
+    prebuild=1
+elif [ "$1" == "push" ]; then
+    push=1
+elif [ "$1" == "run" ]; then
+    run=1
+else
+    echo "Invalid argument"
+    exit 1
+fi
 
 # reset
 if [ $reset == 1 ]; then
@@ -126,5 +106,5 @@ if [ $run == 1 ]; then
       exit 1
     fi
     docker-compose build
-    docker-compose up # 2>&1 | ${_DIR}/exp-openwatch
+    docker-compose up
 fi

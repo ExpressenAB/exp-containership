@@ -1,9 +1,12 @@
 {
   "name": "exp-containership",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Build and deploy applications as containers.",
-  "author": "Expressen AB",
-  "license": "proprietary",
+  "author": "AB Kvällstidningen Expressen",
+  "license": {
+    "type": "MIT",
+    "url": "http://github.com/ExpressenAB/exp-containership/raw/master/LICENSE"
+  },
   "private": true,
   "directories": {
     "ca": "ca",
@@ -15,9 +18,7 @@
     "cli-table": "^0.3.1",
     "colors": "^1",
     "commander": "^2.8.1",
-    "consul": "^0",
     "lodash": "^3.10.1",
-    "prettyjson": "^1",
     "prompt": "0.2.14",
     "request": "^2"
   },
@@ -27,10 +28,6 @@
   },
   "bin": {
     "exp-containership": "scripts/exp-containership.sh",
-    "exp-containerdeploy": "scripts/exp-containerdeploy.js",
-    "exp-consulhelper": "scripts/exp-consulhelper.js",
-    "exp-openwatch": "scripts/exp-openwatch.sh",
-    "docopt.py": "scripts/docopt.py",
-    "docopts.py": "scripts/docopts.py"
+    "exp-containerdeploy": "scripts/exp-containerdeploy.js"
   }
 }
