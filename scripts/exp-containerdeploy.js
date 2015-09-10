@@ -292,13 +292,17 @@ program
   });
 
 program
-  .command('jobs [app]')
+  .command('jobs [revision] [app]')
   .description('lists all jobs for the deployment group')
-  .action(function (app, options) {
+  .action(function (rev, app, options) {
     app = app || process.env['npm_package_name'];
 
     if (!app) {
       return program.help();
+    }
+
+    if (!_.isEmpty(rev)) {
+      app = app + ':' + rev;
     }
 
     tasks.push(function (state, cb) {
@@ -316,27 +320,26 @@ program
         if (err) {
           cb(err);
         } else {
-          printTable(_.map(state.results, function (result) {
-            var job = _.first(_.values(result));
+          //console.log(JSON.stringify(state.results));
+          printTable(_.flatten(_.map(state.results, function (result) {
+            var jobs = _.values(result);
 
-            if (!job) {
-              return cb(new Error('Invalid application: ' + app));
-            }
-
-            return [
-              job.id,
-              _(_.map(job.ports, function (port, name) {
-                return name.yellow + '=' +
-                  (port.externalPort || '<auto>') + ':' +
-                  port.internalPort + '/' +
-                  port.protocol;
-              })).join('\n'),
-              job.image,
-              _(_.map(job.env, function (v, env) {
-                return env.yellow + '=' + v
-              })).join('\n'),
-            ];
-          }), ['ID', 'Ports', 'Image', 'Environment']);
+            return _.map(jobs, function (job) {
+              return [
+                job.id,
+                _(_.map(job.ports, function (port, name) {
+                  return name.yellow + '=' +
+                    (port.externalPort || '<auto>') + ':' +
+                    port.internalPort + '/' +
+                    port.protocol;
+                })).join('\n'),
+                job.image,
+                _(_.map(job.env, function (v, env) {
+                  return env.yellow + '=' + v
+                })).join('\n'),
+              ];
+            });
+          })), ['ID', 'Ports', 'Image', 'Environment']);
           cb(null, state);
         }
       });
