@@ -4,87 +4,115 @@ Build and deploy applications as containers.
 
 ## Requirements
 
-* Linux or OSX
-* boot2docker installed
-* node-starterapp/docker directory
-* A account on Expressens Saltmaster with ACL:s allowing to deploy.
+* Linux or Mac OS X
+* Docker (Linux) / Docker Toolbox (Mac)
+* An account on Expressen's Saltmaster with ACL's allowing you to deploy.
 
 ## Installation
 
-Just add exp-containership to your ``devDependencies``.
-
-NOTE: make sure you don't use ``dependencies``, or else shrinkwrap will block the package from being installed.
+```
+npm install exp-containership --save-dev
+```
 
 ## Configuration
 
 All configuration of exp-containership is done right inside your package.json.
 
-You will need a Dockerfile describing how to build your container. An example can be found in the node-starterapp repo. The exp-containership scripts will build the container using a git-archive dump of the HEAD revision.
+You will need a Dockerfile describing how to build your container. The first time you run `npm run init` or `npm run start`, a default Dockerfile and docker-compose.yml tailored for a Node.js Express app will be created for you.
 
-Important configuration is the helios_jobfile and the helios_deployment_group.
+The following configuration options can be set in package.json under `config.exp-containership`:
 
-* helios_jobfile should be a valid job configuration file for helios (according to https://github.com/spotify/helios/blob/master/docs/user_manual.md#using-a-helios-job-config-file)
+| Option       | Default                    | Description                                                  |
+| ------------ |:--------------------------:| ------------------------------------------------------------:|
+| repo         | exp-docker.repo.dex.nu     | Docker repository address                                    |
+| salt         | https://salt:8000          | Salt API address                                             |
+| ca           | embedded ca                | Path to the CA certificate (PEM format) to use as validation |
+| insecure     | false                      | Whether to skip CA certificate validation                    |
+
 
 #### Define environments
-Add an "exp-containership" configuration to your package.json, describing your build:
+Add an "exp-containership" configuration section to your `package.json`. The minimum required configuration is `helios_deployment_group` and `repo`.
 
-```
-  "config": {
-    "exp-containership": {
-      "repo": "exp-docker.repo.dex.nu",
-      "production": {
-        "helios_jobfile": "docker/production.job",
-        "helios_deployment_group": "jtp-production",
-      }
+```json
+"config": {
+  "exp-containership": {
+    "production": {
+      "helios_deployment_group": "nodestarterapp-production",
     }
-  },
+  }
+}
 ```
 
-Valid options are
+#### Helios job file
+If you require greater control over Helios you can also define `helios_jobfile` to point to a custom Helios job file for your app. The job file will be merged with the [default job file](scripts/helios-job.json) to produce the final version which is sent to Helios.
 
-* ``name`` - name to use for the app (defaults to npm package name).
-* ``repo`` - map of repo config
-* ``[environment]frontend`` - internal loadbalancer config
-* ``[environment].frontend.port`` - listen port for the internal loadbalancer.
-* ``[environment].frontend.backends`` - the desired backend service, defaults to <environment>.<name>
-* ``[environment].instances`` - number of desired containers to start
+* `helios_jobfile` mest be a valid [Helios job configuration file](https://github.com/spotify/helios/blob/master/docs/user_manual.md#using-a-helios-job-config-file)
 
-#### Add container tasks
+Let's say you wanted to disable Varnish.
 
-Add entries to the scripts section to define your container tasks.
-
+1. Specify your job file in `package.json`
+```json
+"config": {
+  "exp-containership": {
+    "production": {
+      "helios_jobfile": "config/production.job"
+    }
+  }
+}
 ```
+
+2. Add the difference to the specified job file
+```json
+{
+  "env" : {
+    "VARNISH_ENABLED": false
+  }
+}
+```
+
+
+3. The final job file will now be the default but with `VARNISH_ENABLED` set to `false`.
+
+#### Adding npm scripts
+
+Add entries to the scripts section to define your exp-containership tasks.
+
+```json
 "scripts": {
-    "container-build": "exp-containership build",
-    "precontainer-build": "exp-containership prebuild",
-    "container-push": "exp-containership push",
-    "container-run": "exp-containership run",
-    "container-test": "exp-containership test",
-    "container-deploy-production": "exp-containership deploy production",
-    "container-undeploy-production": "exp-containership undeploy production",
-    "container-jobs-production": "exp-containership jobs production",
-    "container-status-production": "exp-containership status production",
-    "container-deploy-staging": "exp-containership deploy staging"
-  },
+  "init": "exp-containership init",
+  "reset": "exp-containership reset",
+  "build": "exp-containership build",
+  "start": "exp-containership run",
+  "prepush": "exp-ensure-unmodified && exp-ensure-master",
+  "push": "exp-containership build && exp-containership push",
+  "jobs": "exp-containerdeploy jobs -e",
+  "status": "exp-containerdeploy status -e",
+  "deploy": "exp-containerdeploy deploy -e",
+  "undeploy": "exp-containerdeploy undeploy -e"
+}
 ```
 
 ## Running
 
-Invoke just like any other npm script
+Invoke just like any other npm script:
 
-- Build the container:
-```prompt> npm run container-build```
-- Run the container:
-```prompt> npm run container-run```
-- Push the container to the specified repo
-```prompt> npm run container-push```
-- Run the container in production
-```prompt> npm run container-deploy-production``
+```bash
+# Start the container for local development
+$ npm run start
 
+# Commit your changes
+$ git commit -m "further awesomeness added"
+
+# Build, tag and push the container to the specified Docker repo
+$ npm run push
+
+# Deploy the container to production
+$ npm run deploy production
+```
 
 ## Hooks
 
-To define deploy hooks, we utilze the pre/post feature built into the npm script task. You can define your own scripts and/or use the ones that come with exp-deploy described below.
+To define deploy hooks, we utilize the pre/post feature built into the npm script tasks. You can define your own scripts and/or use the ones that come with [exp-deploy](https://github.com/ExpressenAB/exp-deploy) described below.
 
 #### Pre
 
@@ -95,20 +123,3 @@ To define deploy hooks, we utilze the pre/post feature built into the npm script
 #### Post
 
 * ``exp-set-tag`` - sets a "deployed" tag in git to keep track of what is running in production.
-
-#### Example
-
-```
-"scripts": {
-  "container-build": "exp-containership build",
-  "container-push": "exp-containership push",
-  "container-run": "exp-containership run",
-  "container-deploy-production": "exp-containership deploy production",
-  "container-deploy-staging": "exp-containership deploy staging"
-  "predeploy-production": "exp-ensure-tests && exp-ensure-unmodified && exp-ensure-master"
-  "postdeploy-production": "exp-set-tag && scripts/send-message-to-slack.sh"
-}
-```
-
-
-For ``staging`` and ``test``, just deploy without further actions. For ``production``, ensure that tests run ok, everything is commited to git and that we are on the master branch; afterwards set deploy tag and notify slack using custom script.

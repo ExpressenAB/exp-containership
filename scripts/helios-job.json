@@ -1,0 +1,25 @@
+{
+  "env" : {
+    "PORT" : 3000,
+    "VARNISH_ENABLED": true,
+    "VARNISH_USER": "web",
+    "APP_ENABLED": true,
+    "APP_USER": "web"
+  },
+  "healthCheck" : {
+    "type": "http",
+    "path": "/_alive",
+    "port": "http",
+    "type": "http"
+  },
+  "ports": {
+    "http": {
+      "internalPort": 3000,
+      "protocol": "tcp"
+    }
+  },
+  "resources": {
+    "memory": 2147483648,
+    "cpuShares": 512
+  }
+}
