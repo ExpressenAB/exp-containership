@@ -144,11 +144,16 @@ function execOrchestrate(options, cb) {
   var message = messages.randomMessage();
   var spinner = new Spinner('Please wait -- ' + message +
         (_.endsWith(message, '?') || _.endsWith(message, '!') ? ' %s' : '... %s'));
+  var agentOptions = {};
+  if (!program.insecure && process.env['npm_package_config_exp_containership_insecure'] !== 'true') {
+    agentOptions.ca = options.ca;
+  }
+
   spinner.start();
   request({
     method: "POST",
     url: program.api,
-    agentOptions: { ca: options.ca },
+    agentOptions: agentOptions,
     headers: {
       "X-Auth-Token": options.token,
       "Accept": "application/json"
@@ -457,11 +462,12 @@ program
 program
   .version(pkg.version)
   .option('-e, --environment <name>', 'the environment to run against', 'production')
-  .option('-a, --api <url>', 'the salt stack api endpoint url', 'https://localhost:8000')
+  .option('-a, --api <url>', 'the salt stack api endpoint url', process.env['npm_package_config_exp_containership_salt'] || 'https://salt:8000')
   .option('-u, --user <user>', 'the user to impersonate', process.env['USER'])
-  .option('-r, --repository <address>', 'the docker repository address', process.env['npm_package_config_exp_containership_repo'])
+  .option('-r, --repository <address>', 'the docker repository address', process.env['npm_package_config_exp_containership_repo'] || 'exp-docker.repo.dex.nu')
   .option('-j, --job <file>', 'the helios job file to deploy')
-  .option('-c, --ca <path>', 'the CA cert used to validate the API endpoint', path.resolve(__dirname, '../ca/salt.ca'))
+  .option('-c, --ca <path>', 'the CA cert used to validate the API endpoint', process.env['npm_package_config_exp_containership_ca'] || path.resolve(__dirname, '../ca/salt.ca'))
+  .option('-k, --insecure', 'skip CA cert validation against the API endpoint')
   .parse(process.argv);
 
 if (process.argv.length <= 2) {

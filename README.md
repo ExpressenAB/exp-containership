@@ -20,13 +20,22 @@ All configuration of exp-containership is done right inside your package.json.
 
 You will need a Dockerfile describing how to build your container. The first time you run `npm run init` or `npm run start`, a default Dockerfile and docker-compose.yml tailored for a Node.js Express app will be created for you.
 
+The following configuration options can be set in package.json under `config.exp-containership`:
+
+| Option       | Default                    | Description                                                  |
+| ------------ |:--------------------------:| ------------------------------------------------------------:|
+| repo         | exp-docker.repo.dex.nu     | Docker repository address                                    |
+| salt         | https://salt:8000          | Salt API address                                             |
+| ca           | embedded ca                | Path to the CA certificate (PEM format) to use as validation |
+| insecure     | false                      | Whether to skip CA certificate validation                    |
+
+
 #### Define environments
 Add an "exp-containership" configuration section to your `package.json`. The minimum required configuration is `helios_deployment_group` and `repo`.
 
 ```json
 "config": {
   "exp-containership": {
-    "repo": "exp-docker.repo.dex.nu",
     "production": {
       "helios_deployment_group": "nodestarterapp-production",
     }
@@ -60,6 +69,7 @@ Let's say you wanted to disable Varnish.
   }
 }
 ```
+
 
 3. The final job file will now be the default but with `VARNISH_ENABLED` set to `false`.
 
