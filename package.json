@@ -7,7 +7,7 @@
     "type": "MIT",
     "url": "http://github.com/ExpressenAB/exp-containership/raw/master/LICENSE"
   },
-  "private": true,
+  "private": false,
   "directories": {
     "ca": "ca",
     "templates": "templates"
