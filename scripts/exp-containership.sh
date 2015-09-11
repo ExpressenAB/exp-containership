@@ -95,8 +95,8 @@ fi
 
 if [ $push == 1 ]; then
     echo "Tagging and pushing $npm_package_name:$_REV container"
-    docker tag -f $npm_package_name:$_REV $npm_package_config_exp_containership_repo/$npm_package_name:$_REV
-    docker push $npm_package_config_exp_containership_repo/$npm_package_name:$_REV
+    docker tag -f $npm_package_name:$_REV ${npm_package_config_exp_containership_repo:-exp-docker.repo.dex.nu}/$npm_package_name:$_REV
+    docker push ${npm_package_config_exp_containership_repo:-exp-docker.repo.dex.nu}/$npm_package_name:$_REV
 fi
 
 if [ $run == 1 ]; then
