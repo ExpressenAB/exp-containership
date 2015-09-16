@@ -84,7 +84,7 @@ Add entries to the scripts section to define your exp-containership tasks.
   "build": "exp-containership build",
   "start": "exp-containership run",
   "prepush": "exp-ensure-unmodified && exp-ensure-master",
-  "push": "exp-containership build && exp-containership push",
+  "push": "exp-containership test && exp-containership push",
   "jobs": "exp-containerdeploy jobs -e",
   "status": "exp-containerdeploy status -e",
   "deploy": "exp-containerdeploy deploy -e",
