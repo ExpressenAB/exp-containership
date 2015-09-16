@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 kernel=$(uname -s)
 machine_name="exp-docker"
@@ -7,6 +7,7 @@ _REV=$(git rev-parse --short HEAD)
 init=1
 reset=0
 build=0
+test=0
 push=0
 run=0
 prebuild=0
@@ -18,6 +19,9 @@ elif [ "$1" == "reset" ]; then
     reset=1
 elif [ "$1" == "build" ]; then
     build=1
+elif [ "$1" == "test" ]; then
+    build=1
+    test=1
 elif [ "$1" == "prebuild" ]; then
     prebuild=1
 elif [ "$1" == "push" ]; then
@@ -48,7 +52,11 @@ if [ $init == 1 ]; then
       ls=$(docker-machine ls | grep "${machine_name}")
       if [ -z "${ls}" ]; then
           echo "Creating docker machine..."
-          docker-machine create --driver virtualbox "${machine_name}" >/dev/null
+          docker-machine create \
+            --driver virtualbox \
+            --virtualbox-memory "2048" \
+            --virtualbox-disk-size "40000" \
+            "${machine_name}" >/dev/null
       elif !(echo "${ls}" | grep "Running" >/dev/null); then
           echo "Starting docker machine..."
           docker-machine start "${machine_name}" >/dev/null
@@ -67,6 +75,10 @@ if [ $init == 1 ]; then
   if ! [ -f "./docker-compose.yml" ]; then
     cp "${_DIR}/../exp-containership/templates/docker-compose.yml" .
   fi
+
+  if ! [ -f "./.dockerignore" ]; then
+    cp "${_DIR}/../exp-containership/templates/.dockerignore" .
+  fi
 fi
 
 # prebuild
@@ -83,13 +95,6 @@ fi
 # build
 if [ $build == 1 ]; then
     echo "Building container $npm_package_name:$_REV"
-    #
-    if [ ! -e .dockerignore ]; then
-        cat <<EOF >$_DIR/.dockerignore
-node_modules
-logs
-EOF
-    fi
 	  docker build -t $npm_package_name:$_REV .
 fi
 
@@ -105,6 +110,20 @@ if [ $run == 1 ]; then
       open "https://www.docker.com/toolbox"
       exit 1
     fi
-    docker-compose build
-    docker-compose up
+    shift
+    docker-compose stop "$@"
+    docker-compose rm -f "$@"
+    docker-compose build "$@"
+    docker-compose up "$@"
+fi
+
+if [ $test == 1 ]; then
+    echo "Testing container $npm_package_name:$_REV"
+    if [ "${kernel}" != "Linux" ]; then
+      eval $(VBoxManage showvminfo "$machine_name" --machinereadable | grep hostonlyadapter)
+      ip=$(ifconfig "$hostonlyadapter2" | grep 'inet ' | awk '{ print $2 }')
+    else
+      ip=$(ifconfig eth0 | grep 'inet ' | awk '{ print $2 }')
+    fi
+    docker run -it --rm --add-host="host:$ip" --entrypoint bash "$npm_package_name:$_REV" -c "cd /exp-container/app && NODE_ENV=test npm install && npm test"
 fi
