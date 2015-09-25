@@ -50,6 +50,7 @@ fi
 if [ $init == 1 ]; then
   if (which docker-machine >/dev/null); then
       ls=$(docker-machine ls | grep "${machine_name}")
+      home="/Volumes/Data/Users"
       if [ -z "${ls}" ]; then
           echo "Creating docker machine..."
           docker-machine create \
@@ -57,9 +58,21 @@ if [ $init == 1 ]; then
             --virtualbox-memory "2048" \
             --virtualbox-disk-size "40000" \
             "${machine_name}" >/dev/null
+          if [ -e "${home}" ]; then
+            docker-machine stop "${machine_name}" >/dev/null
+            VBoxManage sharedfolder add "${machine_name}" \
+              --name exp --hostpath $home --automount > /dev/null 2>&1
+            VBoxManage setextradata "${machine_name}" \
+              VBoxInternal2/SharedFoldersEnableSymlinksCreate/exp 1
+            docker-machine start "${machine_name}" >/dev/null
+          fi
       elif !(echo "${ls}" | grep "Running" >/dev/null); then
           echo "Starting docker machine..."
           docker-machine start "${machine_name}" >/dev/null
+      fi
+      if [ -e "${home}" ]; then
+        docker-machine ssh "${machine_name}" \
+          "sudo mkdir -p \"${home}\" && sudo mount -t vboxsf -o uid=1000 -o gid=50 exp \"${home}\""
       fi
       eval $(docker-machine env "${machine_name}")
   elif [ "${kernel}" != "Linux" ]; then
