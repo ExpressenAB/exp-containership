@@ -89,7 +89,8 @@ Add entries to the scripts section to define your exp-containership tasks.
   "status": "exp-containerdeploy status -e",
   "deploy": "exp-containerdeploy deploy -e",
   "undeploy": "exp-containerdeploy undeploy -e",
-  "open": "exp-containership open"
+  "open": "exp-containership open",
+  "ctest": "exp-containership test"
 }
 ```
 
