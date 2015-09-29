@@ -12,6 +12,7 @@ push=0
 run=0
 prebuild=0
 open=0
+exec=0
 
 if [ "$1" == "init" ]; then
     init=1
@@ -33,7 +34,7 @@ elif [ "$1" == "run" ]; then
 elif [ "$1" == "open" ]; then
     open=1
 elif [ "$1" == "exec" ]; then
-    [ -z "$2" ] && (echo "ERROR: missing command to execute"; exit 1)
+    [ -z "$2" ] && { echo "ERROR: missing command to execute"; exit 1; }
     build=1
     exec=1
     exec_cmd=$2
@@ -151,7 +152,7 @@ if [ $exec == 1 ]; then
 fi
 
 if [ $open == 1 ]; then
-  docker-compose ps | grep Up | grep web_1 > /dev/null || (echo "ERROR: No web container found."; exit 1)
+  docker-compose ps | grep Up | grep web_1 > /dev/null || { echo "ERROR: No web container found."; exit 1; }
   container=$(docker-compose ps | grep web_1 | awk 'END{print $1}')
   ip=$(docker-machine ip $machine_name)
   port=$(docker port "$container" | awk -F ':' '{print $NF}')
