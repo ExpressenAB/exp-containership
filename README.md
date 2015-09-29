@@ -37,7 +37,7 @@ Add an "exp-containership" configuration section to your `package.json`. The min
 "config": {
   "exp-containership": {
     "production": {
-      "helios_deployment_group": "nodestarterapp-production",
+      "helios_deployment_group": "nodestarterapp-production"
     }
   }
 }
