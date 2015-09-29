@@ -91,7 +91,7 @@ Add entries to the scripts section to define your exp-containership tasks.
   "undeploy": "exp-containerdeploy undeploy -e",
   "open": "exp-containership open",
   "ctest": "exp-containership test",
-  "shell": "exp-continaership exec bash"
+  "shell": "exp-containership exec bash"
 }
 ```
 
