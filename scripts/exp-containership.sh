@@ -22,7 +22,8 @@ elif [ "$1" == "build" ]; then
     build=1
 elif [ "$1" == "test" ]; then
     build=1
-    test=1
+    exec=1
+    exec_cmd="NODE_ENV=test npm install && npm test"
 elif [ "$1" == "prebuild" ]; then
     prebuild=1
 elif [ "$1" == "push" ]; then
@@ -31,6 +32,11 @@ elif [ "$1" == "run" ]; then
     run=1
 elif [ "$1" == "open" ]; then
     open=1
+elif [ "$1" == "exec" ]; then
+    [ -z "$2" ] && (echo "ERROR: missing command to execute"; exit 1)
+    build=1
+    exec=1
+    exec_cmd=$2
 else
     echo "Invalid argument"
     exit 1
@@ -133,15 +139,15 @@ if [ $run == 1 ]; then
     docker-compose up "$@"
 fi
 
-if [ $test == 1 ]; then
-    echo "Testing container $npm_package_name:$_REV"
+if [ $exec == 1 ]; then
+    echo "Running command \"$exec_cmd\" in container $npm_package_name:$_REV"
     if [ "${kernel}" != "Linux" ]; then
       eval $(VBoxManage showvminfo "$machine_name" --machinereadable | grep hostonlyadapter)
       ip=$(ifconfig "$hostonlyadapter2" | grep 'inet ' | awk '{ print $2 }')
     else
       ip=$(ifconfig eth0 | grep 'inet ' | awk '{ print $2 }')
     fi
-    docker run -it --rm --add-host="host:$ip" --entrypoint bash "$npm_package_name:$_REV" -c "cd /exp-container/app && NODE_ENV=test npm install && npm test"
+    docker run -it --rm --add-host="host:$ip" --entrypoint bash "$npm_package_name:$_REV" -c "cd /exp-container/app && $exec_cmd"
 fi
 
 if [ $open == 1 ]; then
