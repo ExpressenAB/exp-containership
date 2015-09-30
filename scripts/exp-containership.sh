@@ -21,10 +21,12 @@ elif [ "$1" == "reset" ]; then
     reset=1
 elif [ "$1" == "build" ]; then
     build=1
+# Legacy stuff, test targets should be defined using "exec" in package.json
 elif [ "$1" == "test" ]; then
     build=1
     exec=1
-    exec_cmd="NODE_ENV=test npm install && npm test"
+    service="web"
+    exec_cmd="cd /exp-container/app && npm install && npm test"
 elif [ "$1" == "prebuild" ]; then
     prebuild=1
 elif [ "$1" == "push" ]; then
@@ -34,10 +36,11 @@ elif [ "$1" == "run" ]; then
 elif [ "$1" == "open" ]; then
     open=1
 elif [ "$1" == "exec" ]; then
-    [ -z "$2" ] && { echo "ERROR: missing command to execute"; exit 1; }
-    build=1
     exec=1
-    exec_cmd=$2
+    [ "$#" -lt 3 ] && { echo "ERROR: usage: exp-contaionership service cmd_1 cmd_2 ... cmd_N"; exit 1; }
+    service=$2
+    exec_cmd="${@:3}"
+    echo "service $2 cmd $3"
 else
     echo "Invalid argument"
     exit 1
@@ -140,17 +143,6 @@ if [ $run == 1 ]; then
     docker-compose up "$@"
 fi
 
-if [ $exec == 1 ]; then
-    echo "Running command \"$exec_cmd\" in container $npm_package_name:$_REV"
-    if [ "${kernel}" != "Linux" ]; then
-      eval $(VBoxManage showvminfo "$machine_name" --machinereadable | grep hostonlyadapter)
-      ip=$(ifconfig "$hostonlyadapter2" | grep 'inet ' | awk '{ print $2 }')
-    else
-      ip=$(ifconfig eth0 | grep 'inet ' | awk '{ print $2 }')
-    fi
-    docker run -it --rm --add-host="host:$ip" --entrypoint bash "$npm_package_name:$_REV" -c "cd /exp-container/app && $exec_cmd"
-fi
-
 if [ $open == 1 ]; then
   docker-compose ps | grep Up | grep web_1 > /dev/null || { echo "ERROR: No web container found."; exit 1; }
   container=$(docker-compose ps | grep web_1 | awk 'END{print $1}')
@@ -158,3 +150,12 @@ if [ $open == 1 ]; then
   port=$(docker port "$container" | awk -F ':' '{print $NF}')
   open "http://$ip:$port"
 fi
+
+if [ $exec == 1 ]; then
+  docker-compose stop $service
+  docker-compose rm -f $service
+  docker-compose build $service
+  echo  "$exec_cmd"
+  docker-compose run $service -c "$exec_cmd"
+fi
+
