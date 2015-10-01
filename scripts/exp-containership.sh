@@ -37,10 +37,9 @@ elif [ "$1" == "open" ]; then
     open=1
 elif [ "$1" == "exec" ]; then
     exec=1
-    [ "$#" -lt 3 ] && { echo "ERROR: usage: exp-contaionership service cmd_1 cmd_2 ... cmd_N"; exit 1; }
+    [ "$#" -lt 3 ] && { echo "ERROR: usage: exp-containership service cmd_1 cmd_2 ... cmd_N"; exit 1; }
     service=$2
     exec_cmd="${@:3}"
-    echo "service $2 cmd $3"
 else
     echo "Invalid argument"
     exit 1
@@ -155,7 +154,6 @@ if [ $exec == 1 ]; then
   docker-compose stop $service
   docker-compose rm -f $service
   docker-compose build $service
-  echo  "$exec_cmd"
   docker-compose run $service -c "$exec_cmd"
 fi
 
