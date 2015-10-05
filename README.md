@@ -28,6 +28,7 @@ The following configuration options can be set in package.json under `config.exp
 | salt         | https://salt:8000          | Salt API address                                             |
 | ca           | embedded ca                | Path to the CA certificate (PEM format) to use as validation |
 | insecure     | false                      | Whether to skip CA certificate validation                    |
+| eauth        | ldap                       | The Salt eauth type, typically pam or ldap                   |
 
 
 #### Define environments

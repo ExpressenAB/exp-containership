@@ -110,7 +110,7 @@ function login(state, cb) {
         } else {
           request
             .post({ url: program.api + '/login', agentOptions: { ca: state.ca } })
-            .form({ username: result.username, password: result.password, eauth: 'pam' })
+            .form({ username: result.username, password: result.password, eauth: program.eauth })
             .on('response', function(response) {
               if (response.statusCode === 200) {
                 cb(null, _.assign(state, { token: response.headers['x-auth-token'] }));
@@ -463,6 +463,7 @@ program
   .version(pkg.version)
   .option('-e, --environment <name>', 'the environment to run against', 'production')
   .option('-a, --api <url>', 'the salt stack api endpoint url', process.env['npm_package_config_exp_containership_salt'] || 'https://salt:8000')
+  .option('-t, --eauth <name>', 'Salt eauth type, typically pam or ldap (default: ldap)', process.env['npm_package_config_exp_containership_eauth'] || 'ldap')
   .option('-u, --user <user>', 'the user to impersonate', process.env['USER'])
   .option('-r, --repository <address>', 'the docker repository address', process.env['npm_package_config_exp_containership_repo'] || 'exp-docker.repo.dex.nu')
   .option('-j, --job <file>', 'the helios job file to deploy')
