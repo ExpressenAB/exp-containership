@@ -372,6 +372,11 @@ program
           SERVICE_TAGS: rev + ',' + program.environment,
           NODE_ENV : program.environment,
           VERSION: rev
+        },
+        labels: {
+          version: rev,
+          name: app,
+          env: program.environment
         }
       }, state.job);
       execOrchestrate(_.assign(state, {
