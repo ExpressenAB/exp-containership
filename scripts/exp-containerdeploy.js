@@ -52,7 +52,11 @@ function loadJob(state, cb) {
           if (err) {
             cb(err);
           } else {
-            cb(null, _.assign(state, { job: _.merge(_.cloneDeep(heliosJob), JSON.parse(data)) }));
+            if (!program.nojobmerge && process.env['npm_package_config_exp_containership_nojobmerge'] !== 'true') {
+              cb(null, _.assign(state, { job: _.merge(_.cloneDeep(heliosJob), JSON.parse(data)) }));
+            } else {
+              cb(null, _.assign(state, { job: JSON.parse(data) }));
+            }
           }
         });
       } else {
@@ -467,6 +471,7 @@ program
   .option('-u, --user <user>', 'the user to impersonate', process.env['USER'])
   .option('-r, --repository <address>', 'the docker repository address', process.env['npm_package_config_exp_containership_repo'] || 'exp-docker.repo.dex.nu')
   .option('-j, --job <file>', 'the helios job file to deploy')
+  .option('-n, --nojobmerge', 'do not merge the helios jobfiles, use the custom job only')
   .option('-c, --ca <path>', 'the CA cert used to validate the API endpoint', process.env['npm_package_config_exp_containership_ca'] || path.resolve(__dirname, '../ca/salt.ca'))
   .option('-k, --insecure', 'skip CA cert validation against the API endpoint')
   .parse(process.argv);
