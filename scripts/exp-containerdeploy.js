@@ -373,10 +373,8 @@ program
           NODE_ENV : program.environment,
           VERSION: rev
         },
-        labels: {
-          version: rev,
-          name: app,
-          env: program.environment
+        volumes: {
+          "/exp-container/logs:rw" : path.join('/var/log/containers', app)
         }
       }, state.job);
       execOrchestrate(_.assign(state, {
@@ -385,6 +383,7 @@ program
           fun: 'state.orchestrate',
           mods: 'orchestrate.create_helios_job',
           pillar: {
+            name: app,
             job: app + ':' + rev,
             deployUser: program.user,
             image: program.repository + '/' + app + ':' + rev,
@@ -471,7 +470,7 @@ program
 program
   .version(pkg.version)
   .option('-e, --environment <name>', 'the environment to run against', 'production')
-  .option('-a, --api <url>', 'the salt stack api endpoint url', process.env['npm_package_config_exp_containership_salt'] || 'https://salt:8000')
+  .option('-a, --api <url>', 'the salt stack api endpoint url', process.env['npm_package_config_exp_containership_salt'] || 'https://salt-api.service.consul.xpr.dex.nu')
   .option('-t, --eauth <name>', 'Salt eauth type, typically pam or ldap (default: ldap)', process.env['npm_package_config_exp_containership_eauth'] || 'ldap')
   .option('-u, --user <user>', 'the user to impersonate', process.env['USER'])
   .option('-r, --repository <address>', 'the docker repository address', process.env['npm_package_config_exp_containership_repo'] || 'exp-docker.repo.dex.nu')

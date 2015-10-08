@@ -22,14 +22,14 @@ You will need a Dockerfile describing how to build your container. The first tim
 
 The following configuration options can be set in package.json under `config.exp-containership`:
 
-| Option       | Default                    | Description                                                  |
-| ------------ |:--------------------------:| ------------------------------------------------------------:|
-| repo         | exp-docker.repo.dex.nu     | Docker repository address                                    |
-| salt         | https://salt:8000          | Salt API address                                             |
-| ca           | embedded ca                | Path to the CA certificate (PEM format) to use as validation |
-| insecure     | false                      | Whether to skip CA certificate validation                    |
-| eauth        | ldap                       | The Salt eauth type, typically pam or ldap                   |
-| nojobmerge   | false                      | Whether to merge or overwrite the default helios job config  |
+| Option       | Default                                    | Description                                                  |
+| ------------ | ------------------------------------------ | ------------------------------------------------------------ |
+| repo         | exp-docker.repo.dex.nu                     | Docker repository address                                    |
+| salt         | https://salt-api.service.consul.xpr.dex.nu | Salt API address                                             |
+| ca           | embedded ca                                | Path to the CA certificate (PEM format) to use as validation |
+| insecure     | false                                      | Whether to skip CA certificate validation                    |
+| eauth        | ldap                                       | The Salt eauth type, typically pam or ldap                   |
+| nojobmerge   | false                                      | Whether to merge or overwrite the default helios job config  |
 
 #### Define environments
 Add an "exp-containership" configuration section to your `package.json`. The minimum required configuration is `helios_deployment_group` and `repo`.

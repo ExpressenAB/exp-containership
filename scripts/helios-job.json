@@ -1,5 +1,6 @@
 {
   "env" : {
+    "port" : 3000,
     "PORT" : 3000,
     "VARNISH_ENABLED": true,
     "VARNISH_USER": "web",
