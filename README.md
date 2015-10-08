@@ -37,8 +37,10 @@ Add an "exp-containership" configuration section to your `package.json`. The min
 ```json
 "config": {
   "exp-containership": {
-    "production": {
-      "helios_deployment_group": "nodestarterapp-production"
+    "environments": {
+      "production": {
+        "helios_deployment_group": "nodestarterapp-production"
+      }
     }
   }
 }
@@ -55,8 +57,10 @@ Let's say you wanted to disable Varnish.
 ```json
 "config": {
   "exp-containership": {
-    "production": {
-      "helios_jobfile": "config/production.job"
+    "environments": {
+      "production": {
+        "helios_jobfile": "config/production.job"
+      }
     }
   }
 }
