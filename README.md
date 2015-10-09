@@ -37,8 +37,10 @@ Add an "exp-containership" configuration section to your `package.json`. The min
 ```json
 "config": {
   "exp-containership": {
-    "production": {
-      "helios_deployment_group": "nodestarterapp-production"
+    "environments": {
+      "production": {
+        "helios_deployment_group": "nodestarterapp-production"
+      }
     }
   }
 }
@@ -49,14 +51,16 @@ If you require greater control over Helios you can also define `helios_jobfile` 
 
 * `helios_jobfile` mest be a valid [Helios job configuration file](https://github.com/spotify/helios/blob/master/docs/user_manual.md#using-a-helios-job-config-file)
 
-Let's say you wanted to disable Varnish.
+Let's say you wanted to enable Varnish.
 
 1. Specify your job file in `package.json`
 ```json
 "config": {
   "exp-containership": {
-    "production": {
-      "helios_jobfile": "config/production.job"
+    "environments": {
+      "production": {
+        "helios_jobfile": "config/production.job"
+      }
     }
   }
 }
@@ -66,7 +70,7 @@ Let's say you wanted to disable Varnish.
 ```json
 {
   "env" : {
-    "VARNISH_ENABLED": false
+    "VARNISH_ENABLED": true
   }
 }
 ```

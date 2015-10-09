@@ -1,8 +1,9 @@
 {
   "env" : {
-    "port" : 3000,
-    "PORT" : 3000,
-    "VARNISH_ENABLED": true,
+    "port": 3000,
+    "PORT": 3000,
+    "SERVICE_CHECK_HTTP": "/_alive",
+    "VARNISH_ENABLED": false,
     "VARNISH_USER": "web",
     "APP_ENABLED": true,
     "APP_USER": "web"
