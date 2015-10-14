@@ -59,7 +59,7 @@ Let's say you wanted to enable Varnish.
   "exp-containership": {
     "environments": {
       "production": {
-        "helios_jobfile": "config/production.job"
+        "helios_jobfile": "config/production-job.json"
       }
     }
   }
@@ -76,7 +76,7 @@ Let's say you wanted to enable Varnish.
 ```
 
 
-3. The final job file will now be the default but with `VARNISH_ENABLED` set to `false`.
+3. The final job file will now be the default but with `VARNISH_ENABLED` set to `true`.
 
 #### Adding npm scripts
 
