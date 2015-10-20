@@ -13,9 +13,17 @@ var _ = require('lodash'),
     heliosJob = require('./helios-job.json'),
     exec = require('child_process').exec,
     Spinner = require('cli-spinner').Spinner,
+    util = require('util'),
     Table = require('cli-table');
 
 var tokenFile = process.env['HOME'] + '/.exp/salt-token';
+var loglevel = process.env['npm_config_loglevel'];
+
+function logVerbose(format, args) {
+  if (loglevel === 'verbose' || loglevel === 'silly') {
+    console.log(util.format(format, args)); 
+  }
+}
 
 function loadRevision(cb) {
   exec('git rev-parse --short HEAD', function(err, stdout) {
@@ -152,7 +160,7 @@ function execOrchestrate(options, cb) {
   if (!program.insecure && process.env['npm_package_config_exp_containership_insecure'] !== 'true') {
     agentOptions.ca = options.ca;
   }
-
+  logVerbose('Orchestrate request: %s', [JSON.stringify(options.body, undefined, 2)]);
   spinner.start();
   request({
     method: "POST",
@@ -166,12 +174,14 @@ function execOrchestrate(options, cb) {
   }, function (err, response, body) {
     spinner.stop(true);
     if (err) {
+      logVerbose('Orchestrate error: %s', [err]);
       if (err.code == 'ECONNREFUSED') {
         cb(new Error('Error contacting the Salt API endpoint'));
       } else {
         cb(err);
       }
     } else if (response.statusCode === 200) {
+      logVerbose('Orchestrate response: %s', [JSON.stringify(body, undefined, 2)]);
       var ret = _.first(body.return);
       var node = _.first(_.values(_.first(_.values(ret))));
       var changes = node.changes;
@@ -216,15 +226,17 @@ function printTable(data, head) {
     _.each(data, function (v, k) {
       table.push(v);
     });
-  } else {
+    console.log(table.toString());
+  } else if (_.isObject(data)) {
     _.each(data, function (v, k) {
       var obj = {};
       obj[k.cyan] = v;
       table.push(obj);
     });
+    console.log(table.toString());
+  } else {
+    console.log(data);
   }
-
-  console.log(table.toString());
 }
 
 function stateColor(state) {
