@@ -118,6 +118,14 @@ $ npm run push
 $ npm run deploy production
 ```
 
+#### Verbose output
+
+Exp-containership edheres to the npm loglevel, so to get more output during troubleshooting etc:
+
+```bash
+$ npm --loglevel verbose run deploy production
+```
+
 ## Hooks
 
 To define deploy hooks, we utilize the pre/post feature built into the npm script tasks. You can define your own scripts and/or use the ones that come with [exp-deploy](https://github.com/ExpressenAB/exp-deploy) described below.
