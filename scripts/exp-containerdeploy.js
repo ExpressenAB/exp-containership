@@ -266,11 +266,7 @@ program
   .command('status [group]')
   .description('prints the deployment group status')
   .action(function (group, options) {
-    group = group || environmentConfig('helios_deployment_group');
-
-    if (!group) {
-      return program.help();
-    }
+    group = ensure_group(ensure_app(), group);
 
     tasks.push(function (state, cb) {
       execOrchestrate(_.assign(state, {
@@ -312,15 +308,19 @@ program
     });
   });
 
+function ensure_app(app) {
+  return app || process.env['npm_package_name'];
+}
+
+function ensure_group(app, group) {
+  return group || environmentConfig('helios_deployment_group') || app + "-" + program.environment;
+}
+
 program
   .command('jobs [revision] [app]')
   .description('lists all jobs for the deployment group')
   .action(function (rev, app, options) {
-    app = app || process.env['npm_package_name'];
-
-    if (!app) {
-      return program.help();
-    }
+    app = ensure_app(app);
 
     if (!_.isEmpty(rev)) {
       app = app + ':' + rev;
@@ -383,12 +383,10 @@ program
     });
 
     tasks.push(function (state, cb) {
-      group = group || environmentConfig('helios_deployment_group');
-      app = app || process.env['npm_package_name'];
+      app = ensure_app(app);
+      group = ensure_group(app, group);
       rev = rev || state.revision;
-      if (!group || !app || !rev) {
-        return program.help();
-      }
+
       var job = _.merge({
         env: {
           SERVICE_NAME: app,
@@ -459,13 +457,10 @@ program
   .description('undeploys the job from the specified environment')
   .action(function (rev, app, group, options) {
     tasks.push(function (state, cb) {
-      group = group || environmentConfig('helios_deployment_group');
-      app = app || process.env['npm_package_name'];
+      app = ensure_app(app);
+      group = ensure_group(app, group);
       rev = rev || state.revision;
 
-      if (!group || !app || !rev) {
-        return program.help();
-      }
       execOrchestrate(_.assign(state, {
         body: {
           client: 'runner',
