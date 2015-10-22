@@ -371,6 +371,17 @@ program
   .command('deploy [revision] [app] [group]')
   .description('deploys the specified revision to an environment')
   .action(function (rev, app, group, options) {
+    app = app || process.env['npm_package_name'];
+    tasks.push(function (state, cb) {
+      var imageUrl = "https://" + program.repository + "/v1/repositories/" + app + "/tags/" + state.revision;
+      request(imageUrl, function (err, resp) {
+        if (err || resp.statusCode !== 200) {
+          cb("Image not found - " + imageUrl + ": " + (err || resp.statusCode));
+        }
+        cb(null, state);
+      });
+    });
+
     tasks.push(function (state, cb) {
       group = group || environmentConfig('helios_deployment_group');
       app = app || process.env['npm_package_name'];
