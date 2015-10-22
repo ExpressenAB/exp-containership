@@ -230,7 +230,7 @@ function printTable(data, head) {
   } else if (_.isObject(data)) {
     _.each(data, function (v, k) {
       var obj = {};
-      obj[k.cyan] = v;
+      obj[k.cyan] = v || "";
       table.push(obj);
     });
     console.log(table.toString());
@@ -247,6 +247,7 @@ function stateColor(state) {
     case 'HEALTHCHECKING':
     case 'STARTING':
       return state.yellow;
+    case 'DEPLOYMENT_GROUP_NOT_FOUND':
     case 'STOPPED':
     case 'FAILED':
       return state.red;
@@ -398,6 +399,7 @@ program
           "/exp-container/logs:rw" : path.join('/var/log/containers', app)
         }
       }, state.job);
+      logVerbose("Helios job def: " + JSON.stringify(job, undefined, 2));
       execOrchestrate(_.assign(state, {
         body: {
           client: 'runner',
