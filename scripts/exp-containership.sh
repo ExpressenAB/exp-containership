@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 kernel=$(uname -s)
 machine_name="exp-docker"
@@ -49,7 +49,7 @@ fi
 if [ $reset == 1 ]; then
     if [ "${kernel}" != "Linux" ]; then
         if (which docker-machine >/dev/null); then
-            ls=$(docker-machine ls | grep "${machine_name}")
+            ls=$(docker-machine ls | grep "${machine_name}") || true
             if [ -n "${ls}" ]; then
                 echo "Removing docker machine..."
                 docker-machine rm "${machine_name}" >/dev/null
@@ -61,7 +61,7 @@ fi
 # init
 if [ $init == 1 ]; then
   if (which docker-machine >/dev/null); then
-      ls=$(docker-machine ls | grep "${machine_name}")
+      ls=$(docker-machine ls | grep "${machine_name}") || true
       home="/Volumes/Data/Users"
       if [ -z "${ls}" ]; then
           echo "Creating docker machine..."
