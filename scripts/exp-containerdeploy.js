@@ -21,7 +21,7 @@ var loglevel = process.env['npm_config_loglevel'];
 
 function logVerbose(format, args) {
   if (loglevel === 'verbose' || loglevel === 'silly') {
-    console.log(util.format(format, args)); 
+    console.log(util.format(format, args));
   }
 }
 
@@ -411,7 +411,8 @@ program
           VERSION: rev
         },
         volumes: {
-          "/exp-container/logs:rw" : path.join('/var/log/containers', app)
+          "/exp-container/logs:rw" : path.join('/var/log/containers', app),
+          "/root/.pm2/logs:rw" : path.join('/var/log/containers', app)
         }
       }, state.job);
       logVerbose("Helios job def: " + JSON.stringify(job, undefined, 2));
