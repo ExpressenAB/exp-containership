@@ -40,7 +40,7 @@ Example:
 "config": {
   "exp-containership": {
     "repo": "custom-repo.com",
-    "enviorments": {
+    "environments": {
       "production": {
          "helios_deployment_group": "custom-deploymentgroup"
       }
