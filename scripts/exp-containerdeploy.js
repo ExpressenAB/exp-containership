@@ -319,7 +319,6 @@ function ensure_app(app) {
   if (!app) {
     errExit("App name not defined");
   }
-  console.log("App", app);
   return app;
 }
 
@@ -328,7 +327,6 @@ function ensure_group(app, group) {
   if (!group && !envGroup && !program.environment) {
     errExit("Deployment group not defined");
   }
-  console.log("Group", group || envGroup || app + "-" + program.environment);
   return group || envGroup || app + "-" + program.environment;
 }
 
@@ -383,6 +381,10 @@ program
     });
   });
 
+function jobName(app, env, rev) {
+  return app + '-' + env + ":" + rev;
+}
+
 program
   .command('deploy [revision] [app] [group]')
   .description('deploys the specified revision to an environment')
@@ -423,7 +425,7 @@ program
           mods: 'orchestrate.create_helios_job',
           pillar: {
             name: app,
-            job: app + ':' + rev,
+            job: jobName(app, program.environment, rev),
             deployUser: program.user,
             image: program.repository + '/' + app + ':' + rev,
             job_def: new Buffer(JSON.stringify(job)).toString('base64'),
@@ -440,13 +442,15 @@ program
     });
 
     tasks.push(function (state, cb) {
+      app = ensure_app(app);
+      rev = rev || state.revision;
       execOrchestrate(_.assign(state, {
         body: {
           client: 'runner',
           fun: 'state.orchestrate',
           mods: 'orchestrate.deploy_helios',
           pillar: {
-            job: app + ':' + rev,
+            job: jobName(app, program.environment, rev),
             deployUser: program.user,
             deploymentGroup: group
           }
@@ -485,7 +489,7 @@ program
           fun: 'state.orchestrate',
           mods: 'orchestrate.undeploy_helios_job',
           pillar: {
-            job: app + ':' + rev,
+            job: jobName(app, program.environment, rev),
             deployUser: program.user,
             deploymentGroup: group
           }
