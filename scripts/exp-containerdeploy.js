@@ -230,7 +230,7 @@ function printTable(data, head) {
   } else if (_.isObject(data)) {
     _.each(data, function (v, k) {
       var obj = {};
-      obj[k.cyan] = v;
+      obj[k.cyan] = v || "";
       table.push(obj);
     });
     console.log(table.toString());
@@ -247,6 +247,7 @@ function stateColor(state) {
     case 'HEALTHCHECKING':
     case 'STARTING':
       return state.yellow;
+    case 'DEPLOYMENT_GROUP_NOT_FOUND':
     case 'STOPPED':
     case 'FAILED':
       return state.red;
@@ -266,11 +267,7 @@ program
   .command('status [group]')
   .description('prints the deployment group status')
   .action(function (group, options) {
-    group = group || environmentConfig('helios_deployment_group');
-
-    if (!group) {
-      return program.help();
-    }
+    group = ensure_group(ensure_app(), group);
 
     tasks.push(function (state, cb) {
       execOrchestrate(_.assign(state, {
@@ -312,15 +309,34 @@ program
     });
   });
 
+function errExit(msg) {
+  console.error(("ERROR: " + msg).red);
+  process.exit(1);
+}
+
+function ensure_app(app) {
+  var app = app || process.env['npm_package_name'];
+  if (!app) {
+    errExit("App name not defined");
+  }
+  console.log("App", app);
+  return app;
+}
+
+function ensure_group(app, group) {
+  var envGroup = environmentConfig('helios_deployment_group');
+  if (!group && !envGroup && !program.environment) {
+    errExit("Deployment group not defined");
+  }
+  console.log("Group", group || envGroup || app + "-" + program.environment);
+  return group || envGroup || app + "-" + program.environment;
+}
+
 program
   .command('jobs [revision] [app]')
   .description('lists all jobs for the deployment group')
   .action(function (rev, app, options) {
-    app = app || process.env['npm_package_name'];
-
-    if (!app) {
-      return program.help();
-    }
+    app = ensure_app(app);
 
     if (!_.isEmpty(rev)) {
       app = app + ':' + rev;
@@ -371,13 +387,22 @@ program
   .command('deploy [revision] [app] [group]')
   .description('deploys the specified revision to an environment')
   .action(function (rev, app, group, options) {
+    app = app || process.env['npm_package_name'];
     tasks.push(function (state, cb) {
-      group = group || environmentConfig('helios_deployment_group');
-      app = app || process.env['npm_package_name'];
+      var imageUrl = "https://" + program.repository + "/v1/repositories/" + app + "/tags/" + state.revision;
+      request(imageUrl, function (err, resp) {
+        if (err || resp.statusCode !== 200) {
+          return cb("Image not found - " + imageUrl + ": " + (err || resp.statusCode));
+        }
+        cb(null, state);
+      });
+    });
+
+    tasks.push(function (state, cb) {
+      app = ensure_app(app);
+      group = ensure_group(app, group);
       rev = rev || state.revision;
-      if (!group || !app || !rev) {
-        return program.help();
-      }
+
       var job = _.merge({
         env: {
           SERVICE_NAME: app,
@@ -389,6 +414,7 @@ program
           "/exp-container/logs:rw" : path.join('/var/log/containers', app)
         }
       }, state.job);
+      logVerbose("Helios job def: " + JSON.stringify(job, undefined, 2));
       execOrchestrate(_.assign(state, {
         body: {
           client: 'runner',
@@ -448,13 +474,10 @@ program
   .description('undeploys the job from the specified environment')
   .action(function (rev, app, group, options) {
     tasks.push(function (state, cb) {
-      group = group || environmentConfig('helios_deployment_group');
-      app = app || process.env['npm_package_name'];
+      app = ensure_app(app);
+      group = ensure_group(app, group);
       rev = rev || state.revision;
 
-      if (!group || !app || !rev) {
-        return program.help();
-      }
       execOrchestrate(_.assign(state, {
         body: {
           client: 'runner',

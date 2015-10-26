@@ -14,11 +14,13 @@ Build and deploy applications as containers.
 npm install exp-containership --save-dev
 ```
 
+## Docker files
+You will need a Dockerfile describing how to build your container. The first time you run `npm run ecs:init` or `npm run ecs:start`, a default Dockerfile and docker-compose.yml tailored for a Node.js Express app will be created for you.
+
 ## Configuration
 
-All configuration of exp-containership is done right inside your package.json.
-
-You will need a Dockerfile describing how to build your container. The first time you run `npm run init` or `npm run start`, a default Dockerfile and docker-compose.yml tailored for a Node.js Express app will be created for you.
+All configuration of exp-containership is done right inside your package.json. There are sensible defaults for everything so
+you dont have to specify a config unless you have special needs.
 
 The following configuration options can be set in package.json under `config.exp-containership`:
 
@@ -30,23 +32,45 @@ The following configuration options can be set in package.json under `config.exp
 | insecure     | false                                      | Whether to skip CA certificate validation                    |
 | eauth        | ldap                                       | The Salt eauth type, typically pam or ldap                   |
 | nojobmerge   | false                                      | Whether to merge or overwrite the default helios job config  |
+| environments.[env].helios_deployment_group | `[npm_package_name]-[environment]` (for example `nodefish-production`) | Helios deployment group to use per environment. |
 
-#### Define environments
-Add an "exp-containership" configuration section to your `package.json`. The minimum required configuration is `helios_deployment_group` and `repo`.
+Example:
 
 ```json
 "config": {
   "exp-containership": {
-    "environments": {
+    "repo": "custom-repo.com",
+    "enviorments": {
       "production": {
-        "helios_deployment_group": "nodestarterapp-production"
+         "helios_deployment_group": "custom-deploymentgroup"
       }
     }
   }
 }
 ```
 
-#### Helios job file
+#### Adding npm scripts
+
+Add entries to the scripts section to define your exp-containership tasks.
+
+```json
+"scripts": {
+  "ecs:init": "exp-containership init",
+  "ecs:reset": "exp-containership reset",
+  "ecs:build": "exp-containership build",
+  "ecs:start": "exp-containership run",
+  "ecs:prepush": "exp-ensure-unmodified && exp-ensure-master",
+  "ecs:push": "npm run ecs:test && exp-containership push",
+  "ecs:jobs": "exp-containerdeploy jobs -e",
+  "ecs:status": "exp-containerdeploy status -e",
+  "ecs:deploy": "exp-containerdeploy deploy -e",
+  "ecs:undeploy": "exp-containerdeploy undeploy -e",
+  "ecs:open": "exp-containership open",
+  "ecs:test": "exp-containership exec web \"cd /exp-container/app && npm install && npm test\"",
+  "ecs:shell": "exp-containership exec web bash"
+}
+```
+#### Helios job file (optional)
 If you require greater control over Helios you can also define `helios_jobfile` to point to a custom Helios job file for your app. The job file will be merged with the [default job file](scripts/helios-job.json) to produce the final version which is sent to Helios.
 
 * `helios_jobfile` mest be a valid [Helios job configuration file](https://github.com/spotify/helios/blob/master/docs/user_manual.md#using-a-helios-job-config-file)
@@ -75,30 +99,8 @@ Let's say you wanted to enable Varnish.
 }
 ```
 
-
 3. The final job file will now be the default but with `VARNISH_ENABLED` set to `true`.
 
-#### Adding npm scripts
-
-Add entries to the scripts section to define your exp-containership tasks.
-
-```json
-"scripts": {
-  "init": "exp-containership init",
-  "reset": "exp-containership reset",
-  "build": "exp-containership build",
-  "start": "exp-containership run",
-  "prepush": "exp-ensure-unmodified && exp-ensure-master",
-  "push": "npm run ctest && exp-containership push",
-  "jobs": "exp-containerdeploy jobs -e",
-  "status": "exp-containerdeploy status -e",
-  "deploy": "exp-containerdeploy deploy -e",
-  "undeploy": "exp-containerdeploy undeploy -e",
-  "open": "exp-containership open",
-  "ctest": "exp-containership exec web \"cd /exp-container/app && npm install && npm test\"",
-  "shell": "exp-containership exec web bash"
-}
-```
 
 ## Running
 
