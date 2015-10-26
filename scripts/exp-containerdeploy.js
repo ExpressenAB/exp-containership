@@ -309,12 +309,27 @@ program
     });
   });
 
+function errExit(msg) {
+  console.error(("ERROR: " + msg).red);
+  process.exit(1);
+}
+
 function ensure_app(app) {
-  return app || process.env['npm_package_name'];
+  var app = app || process.env['npm_package_name'];
+  if (!app) {
+    errExit("App name not defined");
+  }
+  console.log("App", app);
+  return app;
 }
 
 function ensure_group(app, group) {
-  return group || environmentConfig('helios_deployment_group') || app + "-" + program.environment;
+  var envGroup = environmentConfig('helios_deployment_group');
+  if (!group && !envGroup && !program.environment) {
+    errExit("Deployment group not defined");
+  }
+  console.log("Group", group || envGroup || app + "-" + program.environment);
+  return group || envGroup || app + "-" + program.environment;
 }
 
 program
