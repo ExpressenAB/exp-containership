@@ -15,7 +15,7 @@ npm install exp-containership --save-dev
 ```
 
 ## Docker files
-You will need a Dockerfile describing how to build your container. The first time you run `npm run ecs:init` or `npm run ecs:start`, a default Dockerfile and docker-compose.yml tailored for a Node.js Express app will be created for you.
+You will need a Dockerfile describing how to build your container. The first time you run `npm run xpr:init` or `npm run xpr:start`, a default Dockerfile and docker-compose.yml tailored for a Node.js Express app will be created for you.
 
 ## Configuration
 
@@ -55,19 +55,19 @@ Add entries to the scripts section to define your exp-containership tasks.
 
 ```json
 "scripts": {
-  "ecs:init": "exp-containership init",
-  "ecs:reset": "exp-containership reset",
-  "ecs:build": "exp-containership build",
-  "ecs:start": "exp-containership run",
-  "ecs:prepush": "exp-ensure-unmodified && exp-ensure-master",
-  "ecs:push": "npm run ecs:test && exp-containership push",
-  "ecs:jobs": "exp-containerdeploy jobs -e",
-  "ecs:status": "exp-containerdeploy status -e",
-  "ecs:deploy": "exp-containerdeploy deploy -e",
-  "ecs:undeploy": "exp-containerdeploy undeploy -e",
-  "ecs:open": "exp-containership open",
-  "ecs:test": "exp-containership exec web \"cd /exp-container/app && npm install && npm test\"",
-  "ecs:shell": "exp-containership exec web bash"
+  "xpr:init": "exp-containership init",
+  "xpr:reset": "exp-containership reset",
+  "xpr:build": "exp-containership build",
+  "xpr:start": "exp-containership run",
+  "xpr:prepush": "exp-ensure-unmodified && exp-ensure-master",
+  "xpr:push": "npm run xpr:test && exp-containership push",
+  "xpr:jobs": "exp-containerdeploy jobs -e",
+  "xpr:status": "exp-containerdeploy status -e",
+  "xpr:deploy": "exp-containerdeploy deploy -e",
+  "xpr:undeploy": "exp-containerdeploy undeploy -e",
+  "xpr:open": "exp-containership open",
+  "xpr:test": "exp-containership exec web \"cd /exp-container/app && npm install && npm test\"",
+  "xpr:shell": "exp-containership exec web bash"
 }
 ```
 #### Helios job file (optional)
