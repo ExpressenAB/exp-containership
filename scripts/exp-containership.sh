@@ -86,7 +86,7 @@ if [ $init == 1 ]; then
         docker-machine ssh "${machine_name}" \
           "sudo mkdir -p \"${home}\" && sudo mount -t vboxsf -o uid=1000 -o gid=50 exp \"${home}\""
       fi
-      eval $(docker-machine env "${machine_name}")
+      eval $(docker-machine env --shell bash "${machine_name}")
   elif [ "${kernel}" != "Linux" ]; then
     echo "Need Docker Machine to proceed, please install Docker Toolbox and run this script again"
     open "https://www.docker.com/toolbox"
@@ -156,4 +156,3 @@ if [ $exec == 1 ]; then
   docker-compose build $service
   docker-compose run $service -c "$exec_cmd"
 fi
-
