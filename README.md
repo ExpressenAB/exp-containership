@@ -108,16 +108,16 @@ Invoke just like any other npm script:
 
 ```bash
 # Start the container for local development
-$ npm run start
+$ npm run xpr:start
 
 # Commit your changes
 $ git commit -m "further awesomeness added"
 
 # Build, tag and push the container to the specified Docker repo
-$ npm run push
+$ npm run xpr:push
 
 # Deploy the container to production
-$ npm run deploy production
+$ npm run xpr:deploy production
 ```
 
 #### Verbose output
