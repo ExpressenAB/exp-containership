@@ -66,7 +66,7 @@ Add entries to the scripts section to define your exp-containership tasks.
   "xpr:deploy": "exp-containerdeploy deploy -e",
   "xpr:undeploy": "exp-containerdeploy undeploy -e",
   "xpr:open": "exp-containership open",
-  "xpr:test": "exp-containership exec web \"cd /exp-container/app && npm install && npm test\"",
+  "xpr:test": "exp-containership test",
   "xpr:shell": "exp-containership exec web bash"
 }
 ```
