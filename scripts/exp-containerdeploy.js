@@ -413,8 +413,8 @@ program
           VERSION: rev
         },
         volumes: {
-          "/exp-container/logs:rw" : path.join('/var/log/containers', app),
-          "/root/.pm2/logs:rw" : path.join('/var/log/containers', app)
+          "/exp-container/logs:rw" : path.join('/var/log/containers', program.environment, app),
+          "/root/.pm2/logs:rw" : path.join('/var/log/containers', program.environment, app)
         }
       }, state.job);
       logVerbose("Helios job def: " + JSON.stringify(job, undefined, 2));
