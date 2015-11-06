@@ -6,7 +6,8 @@
     "VARNISH_ENABLED": false,
     "VARNISH_USER": "web",
     "APP_ENABLED": true,
-    "APP_USER": "web"
+    "APP_USER": "web",
+    "PM2_WEB_ENABLED": true
   },
   "healthCheck" : {
     "type": "http",
@@ -21,7 +22,7 @@
     }
   },
   "resources": {
-    "memory": 2147483648,
+    "memory": 3221225472,
     "cpuShares": 512
   }
 }
