@@ -1,3 +1,4 @@
 * Quick getting started guide
+* How to view logs (in prod)
 * How to add custom pm2 config
 * Briefly mention the different stuff working behind the scenes and what it does (docker, compose, salt, helios, consul, pm2 ...)
