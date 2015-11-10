@@ -1,3 +1,3 @@
 * Quick getting started guide
 * How to add custom pm2 config
-* Mention the different stuff working behind the scenes and what it does (docker, compose, salt, helios, consul, pm2 ...)
+* Briefly mention the different stuff working behind the scenes and what it does (docker, compose, salt, helios, consul, pm2 ...)
