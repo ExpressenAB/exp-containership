@@ -32,7 +32,7 @@ NOTE: your in-container tests must succeed for the push to complete.
 
 #### 4. Deploy docker image to an environment of choice.
 
-For the sake of simplicity we will use the "production" environment in all examples from here on. This can of course be replaced with whatever environment your are woorking on.
+For the sake of simplicity we will use the "production" environment in all examples from here on. This can of course be replaced with whatever environment your are working on.
 
 ```
 $ npm run xpr:deploy production
