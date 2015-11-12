@@ -124,7 +124,7 @@ container.
 $ npm run xpr:shell
 ```
 
-This will build/start the container and external services, and give you a shell where you can do
+This will build/start the container and external services, and give you a shell in the "web" container where you can do
 anything you desire. Your node app can be found under '/exp-container/app', start by going there
 and doing an 'npm install'.
 
