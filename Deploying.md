@@ -117,7 +117,7 @@ bash# pm2 restart 1
 
 ##### Custom helios conf
 
-Create your helios job config: [read more](README.md#helios-job-file-optional). For example, when:
+Create your very own helios job config: [read more](README.md#helios-job-file-optional). For example, when:
 * You want to check your app using some other enpoint than `/_alive`.
 * You want to add a varnish cache.
 
