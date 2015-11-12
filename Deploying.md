@@ -7,7 +7,7 @@
 
 Talk to your local infrastructure team if you are missing any of the above.
 
-## 1. Add deployment related scripts to your package.json
+## 2. Add deployment related scripts to your package.json
 
 ```
 "scripts": {
@@ -21,7 +21,7 @@ Talk to your local infrastructure team if you are missing any of the above.
 }
 ```
 
-## 2. Push your docker image to the docker repo
+## 3. Push your docker image to the docker repo
 
 ```
 $ npm run xpr:push
@@ -29,7 +29,7 @@ $ npm run xpr:push
 
 NOTE: your in-container tests must succeed for the push to complete.
 
-## 3. Deploy docker image to an environment of choice.
+## 4. Deploy docker image to an environment of choice.
 
 ```
 $ npm run xpr:deploy production
@@ -62,7 +62,7 @@ If you want to see the status of your app in any given environment, you can use
 $ npm run xpr:status production
 ```
 
-#4 Further reading
+#5 Further reading
 
 Technoligies used behind the scenes:
 
