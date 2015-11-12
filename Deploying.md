@@ -65,7 +65,7 @@ $ npm run xpr:status production
 
 ####5 Further reading
 
-Technoligies used behind the scenes:
+Technologies used behind the scenes:
 
 * Salt - First endpoint in deployment chain, used mostly for authentication
 * Helios - All deployments are helios jobs. 
