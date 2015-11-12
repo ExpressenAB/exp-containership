@@ -71,7 +71,7 @@ $ npm run xpr:status production
 
 #### 5. Access your app
 
-##### WWW
+##### www
 
 You should now be able to access the www endpoint iof your application, if you have one. The adress is on the format: 
 ```
@@ -79,7 +79,7 @@ http://[environment].[your-app-name].service.consul.xpr.dex.nu/
 ```
 For example "http://production.ursula.service.consul.xpr.dex.nu/".
 
-##### SSH
+##### ssh
 
 Run the "xpr:status" npm script for the concerned environment. The output will tell you which servers are hosting your app.
 For example:
