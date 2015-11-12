@@ -123,7 +123,7 @@ Create your very own helios job config: [read more](README.md#helios-job-file-op
 
 ##### Read list
 
-* Salt - First endpoint in deployment chain, used mostly for authentication
+* Salt - First endpoint in deployment chain, used for authentication and orchestration.
 * Helios - All deployments are helios jobs. Deployment groups define where and how your app is deployed. 
 * Consul - Once an app is deployed and running it is managed by consul for health checks and DNS/naming.
 * PM2 - Used to keep your app alive inside the docker container.
