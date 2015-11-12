@@ -6,6 +6,7 @@ Talk to your local infrastructure team to ensure you have all of these:
 
 * Url:s etc to any external services your app uses for the concerned envirnoment(s).
 * A helios deployment group for each environment you want to deploy to. 
+* Acces to the salt master
 * Ssh access to physical machines.
 * An "/_alive" http endpoint in your application, returning "Yes".
 * Optionally, if your app has an www endpoint you'll need a port and a backend service name in consul.
