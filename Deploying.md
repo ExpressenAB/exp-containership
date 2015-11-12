@@ -73,7 +73,7 @@ $ npm run xpr:status production
 
 ##### www
 
-You should now be able to access the www endpoint iof your application, if you have one. The adress is on the format: 
+You should now be able to access the www endpoint of your application, if you have one. The adress is on the format: 
 ```
 http://[environment].[your-app-name].service.consul.xpr.dex.nu/
 ```
