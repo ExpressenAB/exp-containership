@@ -2,11 +2,13 @@
 
 #### 1. Make sure you have everything you need.
 
-Talk to your local infrastructure team if you are missing any of these:
+Talk to your local infrastructure to ensure you have all of these:
 
 * Url:s etc to any external services your app uses for the concerned envirnoment(s).
-* A helios deployment group for each environment you want to deploy to.
-
+* A helios deployment group for each environment you want to deploy to. 
+* Ssh access to physical machines.
+* Optionally, if your app has an www endpoint you'll need a port and a backend service name in consul.
+* An "/_alive" http endpoint in your application, returning "Yes".
 
 #### 2. Add deployment related scripts to your package.json
 
@@ -52,8 +54,7 @@ If all goes well, you will be met with the following sight:
 └─────────────┴────────┘
 ```
 
-Otherwise, re-run the command with the '-dd' flag to npm to increase output. Show this outout to
-your local infrastructure team for further help:
+Otherwise, re-run the command with the '-dd' flag to npm to increase output. Hopefully this will give a hint of what has gone wrong.
 
 ```
 $ npm -dd run xpr:deploy production
@@ -65,7 +66,49 @@ If you want to see the status of your app in any given environment, you can use
 $ npm run xpr:status production
 ```
 
-####5 Further reading
+#### 5. Access your app
+
+##### WWW
+
+You should now be able to access the www endpoint iof your application, if you have one. The adress is on the format: 
+```
+http://[environment].[your-app-name].service.consul.xpr.dex.nu/
+```
+For example "http://production.ursula.service.consul.xpr.dex.nu/".
+
+##### SSH
+
+Run the "xpr:status" npm script for the concerned environment. The output will tell you which servers are hosting your app.
+For example:
+```
+$ npm run xpr:status production
+...
+┌──────────────┬────────────────────────────────────────────────────────────────────┬─────────┐
+│ Host                    Job ID                                                               State   │
+├──────────────┼────────────────────────────────────────────────────────────────────┼─────────┤
+│ xpr-p-app104    ursula-production:8ae679b:a6cb844a483d97509a777f7ba09fe980c0d15287           RUNNING │
+│ xpr-p-app105    ursula-production:8ae679b:a6cb844a483d97509a777f7ba09fe980c0d15287           RUNNING │
+└──────────────┴────────────────────────────────────────────────────────────────────┴─────────┘
+```
+
+Ssh to a server and tail the logs: 
+```
+$ ssh xpr-p-app105.sth.basefarm.net
+xpr-p-app105> tail -F /var/log/containers/production/ursula/*
+```
+
+While still logged in you can go deeper and attach to the docker container with a shell.
+```
+xpr-p-app105> sudo -i
+xpr-p-app105> docker ps 
+CONTAINER ID        IMAGE                                               
+5b50499439dd        exp-docker.repo.dex.nu/ursula:15339ed         
+bb5fe1ed6d61        exp-docker.repo.dex.nu/stromming:07a6458
+xpr-p-app105> docker exec -it 5b50499439dd bash
+bash# pm2 list
+```
+
+#### 6. Further reading
 
 Technologies used behind the scenes:
 
