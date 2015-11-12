@@ -261,13 +261,17 @@ function environmentConfig(config) {
           program.environment + '_' + config];
 }
 
+function serviceUrl(app) {
+  return util.format('http://%s.%s.service.consul.xpr.dex.nu', program.environment, app);
+}
+
 var tasks = [loadRevision, loadCaCert, loadAuthToken, login, saveAuthToken, loadJob];
 
 program
   .command('status [group]')
   .description('prints the deployment group status')
   .action(function (group, options) {
-    group = ensure_group(ensure_app(), group);
+    group = ensure_group(null, group);
 
     tasks.push(function (state, cb) {
       execOrchestrate(_.assign(state, {
@@ -286,8 +290,10 @@ program
           _.each(state.results, function (result) {
             var status = result.deploymentGroupStatus;
             if (status) {
+              var appName = result.deploymentGroup.name.substring(0, result.deploymentGroup.name.lastIndexOf('-'));
               printTable({
                 Name: result.deploymentGroup.name,
+                URL: serviceUrl(appName),
                 "Host Selectors": _(_.map(result.deploymentGroup.hostSelectors, function (v) {
                   return v.label + ' ' + v.operator.yellow + ' ' + v.operand;
                 })).join('\n'),
@@ -327,7 +333,7 @@ function ensure_group(app, group) {
   if (!group && !envGroup && !program.environment) {
     errExit("Deployment group not defined");
   }
-  return group || envGroup || app + "-" + program.environment;
+  return group || envGroup || ensure_app(app) + "-" + program.environment;
 }
 
 program
@@ -384,6 +390,19 @@ program
 function jobName(app, env, rev) {
   return app + '-' + env + ":" + rev;
 }
+
+program
+  .command('open [group]')
+  .description('open the specified deployment group in a browser')
+  .action(function (group) {
+    group = ensure_group(null, group);
+    var appName = group.substring(0, group.lastIndexOf('-'));
+    tasks = [function (cb) {
+      exec('open ' + serviceUrl(appName), function (err) {
+        cb(err);
+      });
+    }];
+  });
 
 program
   .command('deploy [revision] [app] [group]')

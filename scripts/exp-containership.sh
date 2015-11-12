@@ -12,6 +12,7 @@ push=0
 run=0
 prebuild=0
 open=0
+open_environment="development"
 exec=0
 
 if [ "$1" == "init" ]; then
@@ -35,6 +36,7 @@ elif [ "$1" == "run" ]; then
     run=1
 elif [ "$1" == "open" ]; then
     open=1
+    open_environment="${2:-development}"
 elif [ "$1" == "exec" ]; then
     exec=1
     [ "$#" -lt 3 ] && { echo "ERROR: usage: exp-containership service cmd_1 cmd_2 ... cmd_N"; exit 1; }
@@ -143,11 +145,15 @@ if [ $run == 1 ]; then
 fi
 
 if [ $open == 1 ]; then
-  docker-compose ps | grep Up | grep web_1 > /dev/null || { echo "ERROR: No web container found."; exit 1; }
-  container=$(docker-compose ps | grep web_1 | awk 'END{print $1}')
-  ip=$(docker-machine ip $machine_name)
-  port=$(docker port "$container" | awk -F ':' '{print $NF}')
-  open "http://$ip:$port"
+  if [ "$open_environment" == "development" ]; then
+    docker-compose ps | grep Up | grep web_1 > /dev/null || { echo "ERROR: No web container found."; exit 1; }
+    container=$(docker-compose ps | grep web_1 | awk 'END{print $1}')
+    ip=$(docker-machine ip $machine_name)
+    port=$(docker port "$container" | awk -F ':' '{print $NF}')
+    open "http://$ip:$port"
+  else
+    "${_DIR}/exp-containerdeploy" open $npm_package_name-$open_environment
+  fi
 fi
 
 if [ $exec == 1 ]; then
