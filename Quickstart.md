@@ -128,9 +128,18 @@ This will build/start the container and external services, and give you a shell 
 anything you desire. Your node app can be found under '/exp-container/app', start by going there
 and doing an 'npm install'.
 
-#### 7. Further reading
+#### 7. More info
 
-More info on the technologies behind the scenes.
+##### Custom pm2 config 
+
+Create your own pm2 config files: [read more](README.md#custom-pm2-config-optional). For example, when:
+* Your app needs to start a background worker process of some sort.
+* Your apps main script has a different name than 'app.js'
+* You want to use pm2 in some other special way.
+
+##### Read list
+
+Some of the technologies behind the scenes:
 
 * https://docs.docker.com/engine/userguide/ - Docker user guide
 * https://docs.docker.com/compose/ - Compose docs
