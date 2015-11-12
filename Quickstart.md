@@ -2,20 +2,20 @@
 
 How to get your node.js app up and running in a docker container on your development Mac.
 
-## 1. Make sure you have everything you need
+#### 1. Make sure you have everything you need
 
 * Your computer should have an apple on it.
 * If you have previosly installed VirtualBox and/or docker, uninstall all such software and reboot.
 * You have an node-starter-app based node app you want to dockerify.
 
-## 2. Install the node module in your app
+#### 2. Install the node module in your app
 
 ```
 % cd [the-app-you-to-dockerize]
 % npm install exp-containership --save-dev
 ```
 
-## 3. Bootstrap docker stuff
+#### 3. Bootstrap docker stuff
 In the same folder, issue:
 
 ```
@@ -31,11 +31,11 @@ After everything is installed, run the command again:
 
 This should leave you with two new files: `Dockerfile` and `docker-compose.yml`.
 
-## 4. Link external services (optional)
+#### 4. Link external services (optional)
 
 If your app depends on external services (rabbitmq, elasticsearch, mongodb etc), these must also
-run in docker containers. We are using the tool `docker-compose' to manage
-development machine environments, so we'll need a few new entries in your docker-compose.yml file:
+run in docker containers. We are using the tool 'docker-compose' to manage
+development machine environments, so we'll need a few new entries in your `docker-compose.yml` file:
 
 ```
 web:
@@ -96,7 +96,7 @@ json
 
 # 6. Get running
 
-## Run the app ...
+#### Run the app ...
 
 ```
 $ npm run xpr:start
@@ -110,7 +110,7 @@ Now:
 code/config on your local hard drive, the app will be automatically restarted thanks to the
 pm2 'watch' feature/
 
-## ... or test the app ...
+#### ... or test the app ...
 
 ```
 $ npm run xpr:test
@@ -119,7 +119,7 @@ $ npm run xpr:test
 This will start the app and external services, then run the 'npm test` target inside the 'web'
 container.
 
-## .. or get a shell and do whatever you like
+#### .. or get a shell and do whatever you like
 
 ```
 $ npm run xpr:shell
@@ -129,7 +129,7 @@ This will build/start the container and external services, and give you a shell 
 anything you desire. Your node app can be found under '/exp-container/app', start by going there
 and doing an 'npm install'.
 
-# 7. Further reading
+#### 7. Further reading
 
 More info on the technologies behind the scenes.
 
