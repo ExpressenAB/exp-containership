@@ -2,13 +2,15 @@
 
 #### 1. Make sure you have everything you need.
 
-Talk to your local infrastructure to ensure you have all of these:
+Talk to your local infrastructure to ensure you have all of these.
 
 * Url:s etc to any external services your app uses for the concerned envirnoment(s).
 * A helios deployment group for each environment you want to deploy to. 
 * Ssh access to physical machines.
-* Optionally, if your app has an www endpoint you'll need a port and a backend service name in consul.
 * An "/_alive" http endpoint in your application, returning "Yes".
+* Optionally, if your app has an www endpoint you'll need a port and a backend service name in consul.
+
+There are a lot of new things to take in so don't worry if you don't understand what everything means right now.
 
 #### 2. Add deployment related scripts to your package.json
 
@@ -113,6 +115,6 @@ bash# pm2 list
 Technologies used behind the scenes:
 
 * Salt - First endpoint in deployment chain, used mostly for authentication
-* Helios - All deployments are helios jobs. 
+* Helios - All deployments are helios jobs. Deployment groups define where and how your app is deployed. 
 * Consul - Once an app is deployed and running it is managed by consul for health checks and DNS/naming.
 * PM2 - Used to keep your app alive inside the docker container.
