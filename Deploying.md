@@ -1,13 +1,13 @@
 # Deployment super fun with exp-containership
 
-## 1. Make sure you have everything you need.
+#### 1. Make sure you have everything you need.
 
 * Urls to external services for the envirnoment(s) you want to deploy to.
 * A helios deployment group for each environment you want to deploy to.
 
 Talk to your local infrastructure team if you are missing any of the above.
 
-## 2. Add deployment related scripts to your package.json
+#### 2. Add deployment related scripts to your package.json
 
 ```
 "scripts": {
@@ -21,7 +21,7 @@ Talk to your local infrastructure team if you are missing any of the above.
 }
 ```
 
-## 3. Push your docker image to the docker repo
+#### 3. Push your docker image to the docker repo
 
 ```
 $ npm run xpr:push
@@ -29,7 +29,7 @@ $ npm run xpr:push
 
 NOTE: your in-container tests must succeed for the push to complete.
 
-## 4. Deploy docker image to an environment of choice.
+#### 4. Deploy docker image to an environment of choice.
 
 ```
 $ npm run xpr:deploy production
@@ -62,7 +62,7 @@ If you want to see the status of your app in any given environment, you can use
 $ npm run xpr:status production
 ```
 
-#5 Further reading
+####5 Further reading
 
 Technoligies used behind the scenes:
 
