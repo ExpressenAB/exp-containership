@@ -93,9 +93,9 @@ Open your editor of choice and add:
 }
 ```
 
-# 6. Get running
+#### 6. Get running
 
-#### Run the app ...
+##### Run the app ...
 
 ```
 $ npm run xpr:start
@@ -109,7 +109,7 @@ Now:
 code/config on your local hard drive, the app will be automatically restarted thanks to the
 pm2 'watch' feature.
 
-#### ... or test the app ...
+##### ... or test the app ...
 
 ```
 $ npm run xpr:test
@@ -118,7 +118,7 @@ $ npm run xpr:test
 This will start the app and external services, then run the "npm test" target inside the "web"
 container.
 
-#### .. or get a shell and do whatever you like
+##### .. or get a shell and do whatever you like
 
 ```
 $ npm run xpr:shell
