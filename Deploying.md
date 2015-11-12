@@ -93,7 +93,7 @@ $ npm run xpr:status production
 └──────────────┴────────────────────────────────────────────────────────────────────┴─────────┘
 ```
 
-Ssh to a server and tail the logs: 
+Ssh to a server and check it out. For example, tail the logs: 
 ```
 $ ssh xpr-p-app105.sth.basefarm.net
 xpr-p-app105> tail -F /var/log/containers/production/ursula/*
@@ -108,6 +108,8 @@ CONTAINER ID        IMAGE
 bb5fe1ed6d61        exp-docker.repo.dex.nu/stromming:07a6458
 xpr-p-app105> docker exec -it 5b50499439dd bash
 bash# pm2 list
+...
+bash# pm2 restart 1
 ```
 
 #### 6. Further reading
