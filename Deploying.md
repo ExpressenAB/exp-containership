@@ -14,7 +14,7 @@ Talk to your local infrastructure team if you are missing any of the above.
 
   ...
 
-  "xpr:push": "npm run xpr:test && exp-containership push"
+  "xpr:push": "npm run xpr:test && exp-containership push",
   "xpr:status": "exp-containerdeploy status -e",
   "xpr:deploy": "exp-containerdeploy deploy -e"
   
