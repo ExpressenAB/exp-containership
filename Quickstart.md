@@ -115,7 +115,7 @@ pm2 'watch' feature.
 $ npm run xpr:test
 ```
 
-This will start the app and external services, then run the 'npm test` target inside the 'web'
+This will start the app and external services, then run the "npm test" target inside the "web"
 container.
 
 #### .. or get a shell and do whatever you like
