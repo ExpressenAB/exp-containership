@@ -84,8 +84,7 @@ hostname for the concerned services.
 The time is here to add a few new script targets to your `package.json`.
 Open your editor of choice and add:
 
-```
-json
+```json
 "scripts": {
   "xpr:start": "exp-containership run",
   "xpr:open": "exp-containership open",
