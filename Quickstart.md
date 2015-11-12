@@ -122,9 +122,17 @@ container.
 ## .. or get a shell and do whatever you like
 
 ```
-$ npm run xpr:test
+$ npm run xpr:shell
 ```
 
 This will build/start the container and external services, and give you a shell where you can do
 anything you desire. Your node app can be found under '/exp-container/app', start by going there
 and doing an 'npm install'.
+
+# 7. Further reading
+
+More info on the technologies behind the scenes.
+
+* https://docs.docker.com/engine/userguide/ - Docker user guide
+* https://docs.docker.com/compose/ - Compose docs
+* https://github.com/Unitech/pm2 - PM2 Docs
