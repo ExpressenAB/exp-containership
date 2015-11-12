@@ -11,7 +11,7 @@ How to get your node.js app up and running in a docker container on your develop
 #### 2. Install the node module in your app
 
 ```
-% cd [the-app-you-to-dockerize]
+% cd [the-app-you-want-to-dockerize]
 % npm install exp-containership --save-dev
 ```
 
