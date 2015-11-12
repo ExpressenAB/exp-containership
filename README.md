@@ -70,6 +70,17 @@ Add entries to the scripts section to define your exp-containership tasks.
   "xpr:shell": "exp-containership exec web bash"
 }
 ```
+#### Custom pm2 config (optional)
+
+If the pm2 config shipped with the base image does not suit your needs you can specify your own. Add two files called `config/app.json` and `config/dev_app.json` to your application. The former will be used as pm2 config when running your app on your local development machine, the latter will be used in all other environments ("livedata", "production" etc).
+
+You then overwrite the original pm2 config by adding the following where you prefer in your `Dockerfile`:
+
+```
+ADD config/*app.json /exp-container/exec/
+```
+
+
 #### Helios job file (optional)
 If you require greater control over Helios you can also define `helios_jobfile` to point to a custom Helios job file for your app. The job file will be merged with the [default job file](scripts/helios-job.json) to produce the final version which is sent to Helios.
 
@@ -89,7 +100,6 @@ Let's say you wanted to enable Varnish.
   }
 }
 ```
-
 2. Add the difference to the specified job file
 ```json
 {
@@ -100,7 +110,6 @@ Let's say you wanted to enable Varnish.
 ```
 
 3. The final job file will now be the default but with `VARNISH_ENABLED` set to `true`.
-
 
 ## Running
 
