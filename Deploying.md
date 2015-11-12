@@ -114,7 +114,13 @@ bash# pm2 restart 1
 
 #### 6. Further reading
 
-Technologies used behind the scenes:
+##### Custom helios conf
+
+Create your helios job config: [read more](README.md#helios-job-file-optional). For example, when:
+* You want to check your app using some other enpoint than `/_alive`.
+* You want to add a varnish cache.
+
+##### Read list
 
 * Salt - First endpoint in deployment chain, used mostly for authentication
 * Helios - All deployments are helios jobs. Deployment groups define where and how your app is deployed. 
