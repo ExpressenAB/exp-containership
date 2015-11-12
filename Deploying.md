@@ -2,7 +2,7 @@
 
 #### 1. Make sure you have everything you need.
 
-Talk to your local infrastructure to ensure you have all of these.
+Talk to your local infrastructure team to ensure you have all of these.
 
 * Url:s etc to any external services your app uses for the concerned envirnoment(s).
 * A helios deployment group for each environment you want to deploy to. 
