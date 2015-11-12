@@ -2,10 +2,11 @@
 
 #### 1. Make sure you have everything you need.
 
-* Urls to external services for the envirnoment(s) you want to deploy to.
+Talk to your local infrastructure team if you are missing any of these:
+
+* Url:s etc to any external services your app uses for the concerned envirnoment(s).
 * A helios deployment group for each environment you want to deploy to.
 
-Talk to your local infrastructure team if you are missing any of the above.
 
 #### 2. Add deployment related scripts to your package.json
 
