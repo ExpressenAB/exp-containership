@@ -39,13 +39,13 @@ If all goes well, you will be met with the following sight:
 
 ```
 ┌─────────────┬────────┐
-│ Status       │ DONE   │
+│ Status          DONE   │
 ├─────────────┼────────┤
-│ Parallelism  │ 1      │
+│ Parallelism    1       │
 ├─────────────┼────────┤
-│ Duration     │ 23.709 │
+│ Duration       23.709  │
 ├─────────────┼────────┤
-│ Timeout      │ 120    │
+│ Timeout        120     │
 └─────────────┴────────┘
 ```
 
