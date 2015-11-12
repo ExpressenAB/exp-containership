@@ -79,7 +79,7 @@ the hostname 'linked-rabbitmq'.
 * We have also added new environment variables in the 'web' container so that exp-config will use the correct
 hostname for the concerned services.
 
-## 5. Scripts, script, scripts
+#### 5. Scripts, script, scripts
 
 The time is here to add a few new script targets to your `package.json`.
 Open your editor of choice and add:
