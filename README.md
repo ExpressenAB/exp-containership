@@ -2,7 +2,7 @@
 
 Build and deploy applications as containers.
 
-Start here if you are new to exp-containership:
+Newcomers, start here pease:
 * [Development quickstart](Quickstart.md#development-super-fun-with-exp-containership)
 * [Deployment quickstart](Deploying.md#deployment-super-fun-with-exp-containership)
 
