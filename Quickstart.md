@@ -1,4 +1,4 @@
-# Exp-containership dev env quick start
+# Development super fun with exp-containership 
 
 How to get your node.js app up and running in a docker container on your development Mac.
 
