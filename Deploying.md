@@ -96,7 +96,7 @@ $ npm run xpr:status production
 
 Ssh to a server and check it out. For example, tail the logs: 
 ```
-$ ssh xpr-p-app105
+$ ssh xpr-p-app105.sth.basefarm.net
 xpr-p-app105> tail -F /var/log/containers/production/ursula/*
 ```
 
