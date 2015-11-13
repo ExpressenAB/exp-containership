@@ -9,7 +9,7 @@ Talk to your local infrastructure team to ensure you have all of these:
 * Access to the salt master
 * Ssh access to physical machines.
 * An "/_alive" http endpoint in your application, returning "Yes".
-* Optionally, if your app has an www endpoint you'll need a port and a backend service name in consul.
+* A port and a backend service name in consul (if your app exposes an http endpoint).
 
 There are a lot of new things to take in so don't worry if you don't understand what everything means right now.
 
