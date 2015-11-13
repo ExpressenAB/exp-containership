@@ -6,9 +6,6 @@ Newcomers, start here pease:
 * [Development quickstart](Quickstart.md#development-super-fun-with-exp-containership)
 * [Deployment quickstart](Deploying.md#deployment-super-fun-with-exp-containership)
 
-## Docker files
-You will need a Dockerfile describing how to build your container. The first time you run `npm run xpr:init` or `npm run xpr:start`, a default Dockerfile and docker-compose.yml tailored for a Node.js Express app will be created for you.
-
 ## Configuration
 
 All configuration of exp-containership is done right inside your package.json. There are sensible defaults for everything so
