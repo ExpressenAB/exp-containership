@@ -71,12 +71,12 @@ rabbitmq:
 
 What we have done here is:
 
-* Added two additional containers 'elasticsearch' and 'rabbitmq', in addition to the main container
+* Added two additional containers "elasticsearch" and "rabbitmq", in addition to the main container
 that was already present (called 'web')
-* The 'web' container can access 'elasticseach' and 'rabbitmq' thanks to the 'links' property.
-'elasticsearch' can be reached under the hostname 'linked-elasticsearch', 'rabbit' can be reached via
-the hostname 'linked-rabbitmq'.
-* We have also added new environment variables in the 'web' container so that exp-config will use the correct
+* The "web" container can access "elasticseach" and "rabbitmq" thanks to the "links" property.
+"elasticsearch" can be reached under the hostname "linked-elasticsearch", "rabbit" can be reached via
+the hostname "linked-rabbitmq".
+* We have also added new environment variables in the "web" container so that exp-config will use the correct
 hostname for the concerned services.
 
 #### 5. Scripts, script, scripts
@@ -103,11 +103,11 @@ $ npm run xpr:start
 
 Now:
 
-* Your app and any external services defined are started inside docker containers.
-* Your app will run using pm2 inside the container.
-* Your local project folder is magically linked into the docker container. If you edit your
+* Your app and any external services defined are started as docker containers.
+* Your app will run using pm2 inside the "web" container.
+* Your local project folder is magically linked into the "web" docker container. If you edit your
 code/config on your local hard drive, the app will be automatically restarted thanks to the
-pm2 'watch' feature.
+pm2 "watch" feature.
 
 ##### ... or test the app ...
 
