@@ -144,3 +144,25 @@ Some of the technologies behind the scenes:
 * https://docs.docker.com/engine/userguide/ - Docker user guide
 * https://docs.docker.com/compose/ - Compose docs
 * https://github.com/Unitech/pm2 - PM2 Docs
+
+#### 8. Troubleshooting
+
+It might not be your fault when stuff goes wrong. Sometimes Docker gets confused, and you need to tell it to get it's stuff together again.
+
+First, try restarting the docker machine:
+
+```
+$ docker-machine restart exp-container
+```
+
+This operation is fairly quick and usually resolves the problem if Docker has gotten in a state of confusion.
+
+If nothing else helps you can try this (in your applications root folder) as a last resort:
+
+```
+$ ./node_modules/.bin/exp-containership reset
+```
+
+This removes the entire virtual that hosts your docker containers, so it will take quite some time to build your project afterwards as images must be downloaded again.
+
+
