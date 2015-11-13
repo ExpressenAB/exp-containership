@@ -2,17 +2,9 @@
 
 Build and deploy applications as containers.
 
-## Requirements
-
-* Linux or Mac OS X
-* Docker (Linux) / Docker Toolbox (Mac)
-* An account on Expressen's Saltmaster with ACL's allowing you to deploy.
-
-## Installation
-
-```
-npm install exp-containership --save-dev
-```
+Start here if you are new to exp-containership:
+* [Development quickstart](Quickstart.md#development-super-fun-with-exp-containership)
+* [Deployment quickstart](Deploying.md#deployment-super-fun-with-exp-containership)
 
 ## Docker files
 You will need a Dockerfile describing how to build your container. The first time you run `npm run xpr:init` or `npm run xpr:start`, a default Dockerfile and docker-compose.yml tailored for a Node.js Express app will be created for you.
