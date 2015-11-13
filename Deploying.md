@@ -29,6 +29,8 @@ There are a lot of new things to take in so don't worry if you don't understand 
 
 #### 3. Push your docker image to the docker repo
 
+The docker image of your application must be present in your corpoorate-wide Docker repo, so that the deployment tools can find it and distribute it to the concerned servers. 
+
 ```
 $ npm run xpr:push
 ```
@@ -68,6 +70,8 @@ If you want to see the status of your app in any given environment, you can use
 ```
 $ npm run xpr:status production
 ```
+
+This will show you on what hardware your app is running and what state it is in. 
 
 #### 5. Access your app
 
