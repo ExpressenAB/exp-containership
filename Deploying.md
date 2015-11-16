@@ -26,7 +26,7 @@ There are a lot of new things to take in so don't worry if you don't understand 
 }
 ```
 
-#### 4. Deploy docker image to an environment of choice.
+#### 3. Deploy docker image to an environment of choice.
 
 NOTE: For the sake of simplicity we will use the "production" environment in all examples from here on. This can of course be replaced with whatever environment your are working on.
 
@@ -71,7 +71,7 @@ $ npm run xpr:status production
 
 This will show you on what hardware your app is running and what state it is in. 
 
-#### 5. Access your app
+#### 4. Access your app
 
 ##### www
 
@@ -115,7 +115,7 @@ bash# pm2 list
 bash# pm2 restart 1
 ```
 
-#### 6. Further reading
+#### 5. Further reading
 
 ##### Custom helios conf
 
