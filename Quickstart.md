@@ -120,7 +120,16 @@ $ npm run xpr:test
 This will start the app and external services, then run the "npm test" target inside the "web"
 container.
 
-##### .. or get a shell and do whatever you like
+##### ... or open your apps web interface in your browser ...
+
+```
+$ npm run xpr:test
+```
+
+This will figure out the ip adress and port of your dockerized app and open it up in a new tab in your browser. Try it,
+you'll like it!
+
+##### ... or get a shell and do whatever you like
 
 ```
 $ npm run xpr:shell
