@@ -413,7 +413,14 @@ program
       var imageUrl = "https://" + program.repository + "/v1/repositories/" + app + "/tags/" + state.revision;
       request(imageUrl, function (err, resp) {
         if (err || resp.statusCode !== 200) {
-          return cb("Image not found - " + imageUrl + ": " + (err || resp.statusCode));
+          // No image in repo lets push one, if it fails this call will throw.
+          console.log("Image not found - " + imageUrl + ": " + (err || resp.statusCode) + ", building image and pushing to repo");
+          var contCmd = __dirname + "/exp-containership.sh";
+          var cmd = exec(contCmd + " build && " + contCmd + " push", function  (error, stdout, stderr) {
+            cb(null, state);
+          });
+          cmd.stdout.pipe(process.stdout);
+          return;
         }
         cb(null, state);
       });
