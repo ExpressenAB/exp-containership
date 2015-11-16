@@ -414,8 +414,8 @@ program
       request(imageUrl, function (err, resp) {
         if (err || resp.statusCode !== 200) {
           // No image in repo lets push one, if it fails this call will throw.
-          console.log("Image not found - " + imageUrl + ": " + (err || resp.statusCode) + ", building image");
-          var contCmd = __dirname + "/exp-containership.sh"
+          console.log("Image not found - " + imageUrl + ": " + (err || resp.statusCode) + ", building image and pushing to repo");
+          var contCmd = __dirname + "/exp-containership.sh";
           var cmd = exec(contCmd + " build && " + contCmd + " push", function  (error, stdout, stderr) {
             cb(null, state);
           });
