@@ -126,8 +126,7 @@ container.
 $ npm run xpr:open
 ```
 
-This will figure out the ip adress and port of your dockerized app and open it up in a new tab in your browser. Try it,
-you'll like it!
+This will figure out the ip adress and port of your dockerized app and open it up in a new tab in your browser.
 
 ##### ... or get a shell and do whatever you like
 
