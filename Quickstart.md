@@ -79,6 +79,8 @@ the hostname "linked-rabbitmq".
 * We have also added new environment variables in the "web" container so that exp-config will use the correct
 hostname for the concerned services.
 
+NOTE: The "compose" tool and all settings above are only used when running your dockerified app locally. Once your app is deployed to an actual environment, none of this stuff is used.
+
 #### 5. Scripts, script, scripts
 
 The time is here to add a few new script targets to your `package.json`.
