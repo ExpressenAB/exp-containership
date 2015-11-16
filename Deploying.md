@@ -20,30 +20,28 @@ There are a lot of new things to take in so don't worry if you don't understand 
 
   ...
 
-  "xpr:push": "npm run xpr:test && exp-containership push",
   "xpr:status": "exp-containerdeploy status -e",
   "xpr:deploy": "exp-containerdeploy deploy -e"
   
 }
 ```
 
-#### 3. Push your docker image to the docker repo
-
-The docker image of your application must be present in your corpoorate-wide Docker repo, so that the deployment tools can find it and distribute it to the concerned servers. 
-
-```
-$ npm run xpr:push
-```
-
-NOTE: your in-container tests must succeed for the push to complete.
-
 #### 4. Deploy docker image to an environment of choice.
 
-For the sake of simplicity we will use the "production" environment in all examples from here on. This can of course be replaced with whatever environment your are working on.
+NOTE: For the sake of simplicity we will use the "production" environment in all examples from here on. This can of course be replaced with whatever environment your are working on.
+
+Issue the following command to deploy your app:
+
 
 ```
 $ npm run xpr:deploy production
 ```
+
+This task will
+
+* Ensure that the docker repo contains an image for your build. 
+* If not; build, test and push the image to the docker repo.
+* Start a deployment job deploying the docker image and wait for it to finish.
 
 If all goes well, you will be met with the following sight:
 
