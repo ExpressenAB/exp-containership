@@ -95,7 +95,7 @@ Open your editor of choice and add:
 }
 ```
 
-#### 6. Get running
+#### 6. Get going
 
 ##### Run the app ...
 
