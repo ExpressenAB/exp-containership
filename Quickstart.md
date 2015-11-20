@@ -106,9 +106,8 @@ $ npm run xpr:start
 Now:
 
 * Your app and any external services defined are started as docker containers.
-* Your app will run using pm2 inside the "web" container.
-* Your local project folder is magically linked into the "web" docker container. If you edit your
-code/config on your local hard drive, the app will be automatically restarted thanks to the
+* Your app is started using pm2 inside the "web" container.
+* Your local project folder is magically linked into the "web" docker container. If you edit the code/config on your local hard drive, the app will be automatically restarted thanks to the
 pm2 "watch" feature.
 
 ##### ... or test the app ...
