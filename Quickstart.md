@@ -8,7 +8,7 @@ How to get your node.js app up and running in a docker container on your develop
 * If you have previosly installed VirtualBox and/or docker, uninstall all such software and reboot.
 * You have an node-starter-app based node app you want to dockerify.
 
-#### 2. Install the node module in your app
+#### 2. Install the exp-containership module
 
 ```
 % cd [the-app-you-want-to-dockerize]
