@@ -2,4 +2,5 @@
 *.iml
 *.tgz
 *~
+.tern-port
 node_modules
