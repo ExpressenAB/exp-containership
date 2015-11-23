@@ -441,7 +441,9 @@ program
           SERVICE_NAME: app,
           SERVICE_TAGS: rev + ',' + program.environment,
           NODE_ENV : program.environment,
-          VERSION: rev
+          VERSION: rev,
+          DEPLOYMENT_USER: program.user,
+          DEPLOYMENT_DATE: new Date()
         },
         volumes: {
           "/exp-container/logs:rw" : path.join('/var/log/containers', program.environment, app),
