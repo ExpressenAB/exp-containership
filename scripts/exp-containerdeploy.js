@@ -407,36 +407,43 @@ program
 program
   .command('deploy [revision] [app] [group]')
   .description('deploys the specified revision to an environment')
-  .action(function (rev, app, group, options) {
+  .action(function (revisionParam, app, group, options) {
     app = app || process.env['npm_package_name'];
-    tasks.push(function (state, cb) {
-      var imageUrl = "https://" + program.repository + "/v1/repositories/" + app + "/tags/" + state.revision;
-      request(imageUrl, function (err, resp) {
-        if (err || resp.statusCode !== 200) {
-          // No image in repo lets push one, if it fails this call will throw.
-          console.log("Image not found - " + imageUrl + ": " + (err || resp.statusCode) + ", building image and pushing to repo");
-          var contCmd = __dirname + "/exp-containership.sh";
-          var cmd = exec(contCmd + " build && " + contCmd + " push", function  (error, stdout, stderr) {
-            cb(null, state);
-          });
-          cmd.stdout.pipe(process.stdout);
-          return;
-        }
-        cb(null, state);
+
+    // If we have not specified an image to deploy and there is no image in the
+    // repo for the current revisios - build and push image for current rev
+    if (!revisionParam) {
+      tasks.push(function (state, cb) {
+        var rev = revisionParam || state.revision;
+        var imgUrl = "https://" + program.repository + "/v1/repositories/" + app + "/tags/" + rev;
+        request(imgUrl, function (err, resp) {
+          if (err || resp.statusCode !== 200) {          
+            console.log("Image not found - " + imgUrl + ": " + (err || resp.statusCode) +
+                        ", building image and pushing to repo");
+            var contCmd = __dirname + "/exp-containership.sh";
+            var cmd = exec(contCmd + " build && " + contCmd + " push", function  (error, stdout) {
+              cb(null, state);
+            });
+            cmd.stdout.pipe(process.stdout);
+            return;
+          }
+          cb(null, state);
+        });
       });
-    });
+    }
 
     tasks.push(function (state, cb) {
       app = ensure_app(app);
       group = ensure_group(app, group);
-      rev = rev || state.revision;
-
+      var rev = revisionParam || state.revision;
       var job = _.merge({
         env: {
           SERVICE_NAME: app,
           SERVICE_TAGS: rev + ',' + program.environment,
           NODE_ENV : program.environment,
-          VERSION: rev
+          VERSION: rev,
+          DEPLOYMENT_USER: program.user,
+          DEPLOYMENT_DATE: new Date()
         },
         volumes: {
           "/exp-container/logs:rw" : path.join('/var/log/containers', program.environment, app),
@@ -469,7 +476,7 @@ program
 
     tasks.push(function (state, cb) {
       app = ensure_app(app);
-      rev = rev || state.revision;
+      var rev = revisionParam || state.revision;
       execOrchestrate(_.assign(state, {
         body: {
           client: 'runner',
