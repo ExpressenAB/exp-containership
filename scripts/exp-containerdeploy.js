@@ -440,6 +440,7 @@ program
         },
         volumes: {
           "/exp-container/logs:rw" : path.join('/var/log/containers', program.environment, app),
+          "/exp-container/data:rw" : path.join('/var/lib/containers', program.environment, app),
           "/root/.pm2/logs:rw" : path.join('/var/log/containers', program.environment, app)
         }
       }, state.job);
