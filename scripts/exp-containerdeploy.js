@@ -152,7 +152,11 @@ function saveAuthToken(state, cb) {
   });
 }
 
-function execOrchestrate(options, cb) {
+function execOrchestrate(options, filter, cb) {
+  if (_.isFunction(filter)) {
+    cb = filter;
+    filter = null;
+  }
   var message = messages.randomMessage();
   var spinner = new Spinner('Please wait -- ' + message +
         (_.endsWith(message, '?') || _.endsWith(message, '!') ? ' %s' : '... %s'));
@@ -182,14 +186,32 @@ function execOrchestrate(options, cb) {
       }
     } else if (response.statusCode === 200) {
       logVerbose('Orchestrate response: %s', [JSON.stringify(body, undefined, 2)]);
-      var ret = _.first(body.return);
-      var node = _.first(_.values(_.first(_.values(ret))));
-      var changes = node.changes;
 
-      if (!changes) {
-        return cb(new Error(JSON.stringify(node)));
+      var statements = _.reduce(_.flatten(_.map(body.return, function (node) {
+        return _.values(node);
+      })), function (result, statement) {
+        return _.assign(result || {}, statement);
+      });
+
+      logVerbose('Statements: %s', [JSON.stringify(statements, undefined, 2)]);
+
+      var statementName = _.find(_.keys(statements), function (name) {
+        if (filter) {
+          return name.indexOf('_|-' + filter + '_|-') >= 0;
+        } else {
+          return true;
+        }
+      });
+
+      var statement = statements[statementName];
+
+      logVerbose('Statement: %s', [JSON.stringify(statement, undefined, 2)]);
+
+      if (!statement || !statement.changes) {
+        return cb(new Error('Invalid response from API'));
       }
 
+      var changes = statement.changes;
       var results = _.map(changes.ret, function (v, k) {
         try {
           return JSON.parse(v);
@@ -340,7 +362,7 @@ program
   .command('jobs [revision] [app]')
   .description('lists all jobs for the deployment group')
   .action(function (rev, app, options) {
-    app = ensure_app(app);
+    app = ensure_app(app) + '-' + program.environment;
 
     if (!_.isEmpty(rev)) {
       app = app + ':' + rev;
@@ -361,7 +383,6 @@ program
         if (err) {
           cb(err);
         } else {
-          //console.log(JSON.stringify(state.results));
           printTable(_.flatten(_.map(state.results, function (result) {
             var jobs = _.values(result);
 
@@ -392,13 +413,12 @@ function jobName(app, env, rev) {
 }
 
 program
-  .command('open [group]')
-  .description('open the specified deployment group in a browser')
-  .action(function (group) {
-    group = ensure_group(null, group);
-    var appName = group.substring(0, group.lastIndexOf('-'));
+  .command('open [app]')
+  .description('open the specified app environment in a browser')
+  .action(function (app) {
+    app = ensure_app(app);
     tasks = [function (cb) {
-      exec('open ' + serviceUrl(appName), function (err) {
+      exec('open ' + serviceUrl(app), function (err) {
         cb(err);
       });
     }];
@@ -475,27 +495,34 @@ program
         body: {
           client: 'runner',
           fun: 'state.orchestrate',
-          mods: 'orchestrate.deploy_helios',
+          mods: 'orchestrate.deploy_helios_v0_2',
           pillar: {
             job: jobName(app, program.environment, rev),
             deployUser: program.user,
-            deploymentGroup: group
+            deploymentGroup: group,
+            app: app,
+            environment: program.environment,
+            revision: rev,
+            ts: (new Date()).getTime() / 1000
           }
         }
-      }), function (err, state) {
+      }), 'deploy_helios_job', function (err, state) {
         if (err) {
           cb(err);
         } else {
-          _.each(state.results, function (result) {
+          var result = _.first(state.results);
+
+          if (result) {
             printTable({
               Status: stateColor(result.status),
               Parallelism: result.parallelism,
               Duration: result.duration,
               Timeout: result.timeout
             });
-          });
-
-          cb(null, state);
+            cb(null, state);
+          } else {
+            cb(new Error('Invalid response returned by API'));
+          }
         }
       });
     });

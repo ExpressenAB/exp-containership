@@ -152,7 +152,7 @@ if [ $open == 1 ]; then
     port=$(docker port "$container" | awk -F ':' '{print $NF}')
     open "http://$ip:$port"
   else
-    "${_DIR}/exp-containerdeploy" open $npm_package_name-$open_environment
+    "${_DIR}/exp-containerdeploy" -e $open_environment open $npm_package_name
   fi
 fi
 
