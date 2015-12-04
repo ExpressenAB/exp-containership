@@ -4,9 +4,7 @@
     "PORT": 3000,
     "SERVICE_CHECK_HTTP": "/_alive",
     "VARNISH_ENABLED": false,
-    "VARNISH_USER": "web",
     "APP_ENABLED": true,
-    "APP_USER": "web",
     "PM2_WEB_ENABLED": true
   },
   "healthCheck" : {

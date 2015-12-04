@@ -8,7 +8,6 @@ web:
   environment:
     - NODE_ENV=development
     - DEV_APP_ENABLED=true
-    - DEV_APP_USER=web
   volumes:
     - ./:/exp-container/app
     # Link node modules with host fs to avoid uneccessary rebuild after container restart

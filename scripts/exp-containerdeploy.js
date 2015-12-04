@@ -437,7 +437,7 @@ program
           console.log("Image not found - " + imageUrl + ": " + (err || resp.statusCode) + ", building image and pushing to repo");
           var contCmd = __dirname + "/exp-containership.sh";
           var cmd = exec(contCmd + " build && " + contCmd + " push", function  (error, stdout, stderr) {
-            cb(null, state);
+            cb(error, state);
           });
           cmd.stdout.pipe(process.stdout);
           return;
@@ -461,7 +461,8 @@ program
         volumes: {
           "/exp-container/logs:rw" : path.join('/var/log/containers', program.environment, app),
           "/exp-container/data:rw" : path.join('/var/lib/containers', program.environment, app),
-          "/root/.pm2/logs:rw" : path.join('/var/log/containers', program.environment, app)
+          "/root/.pm2/logs:rw" : path.join('/var/log/containers', program.environment, app),
+          "/home/web/.pm2/logs:rw" : path.join('/var/log/containers', program.environment, app)
         }
       }, state.job);
       logVerbose("Helios job def: " + JSON.stringify(job, undefined, 2));
