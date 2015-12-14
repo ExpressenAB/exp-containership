@@ -161,7 +161,7 @@ It might not be your fault when stuff goes wrong. Sometimes Docker gets confused
 First, try restarting the docker machine:
 
 ```
-$ docker-machine restart exp-container
+$ docker-machine restart exp-docker
 ```
 
 This operation is fairly quick and usually resolves the problem if Docker has gotten in a state of confusion.
