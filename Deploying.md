@@ -110,6 +110,7 @@ CONTAINER ID        IMAGE
 5b50499439dd        exp-docker.repo.dex.nu/ursula:15339ed         
 bb5fe1ed6d61        exp-docker.repo.dex.nu/stromming:07a6458
 xpr-p-app105> docker exec -it 5b50499439dd bash
+root# su -s /bin/bash -l web
 bash# pm2 list
 ...
 bash# pm2 restart 1
