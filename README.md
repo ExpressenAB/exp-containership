@@ -56,7 +56,8 @@ Add entries to the scripts section to define your exp-containership tasks.
   "xpr:undeploy": "exp-containerdeploy undeploy -e",
   "xpr:open": "exp-containership open",
   "xpr:test": "exp-containership test",
-  "xpr:shell": "exp-containership exec web bash"
+  "xpr:shell": "exp-containership exec web bash",
+  "xpr:logs": "exp-logs"
 }
 ```
 #### Custom pm2 config (optional)
@@ -139,3 +140,33 @@ To define deploy hooks, we utilize the pre/post feature built into the npm scrip
 #### Post
 
 * ``exp-set-tag`` - sets a "deployed" tag in git to keep track of what is running in production.
+
+## Log tailing
+
+You can conveniently tail log files in different environments using the log script included with exp-containership. Just make sure to add the following script entry to your package.json:
+
+```
+"scripts": {
+  ...
+  "xpr:logs": "exp-logs",
+  ...
+}
+```
+
+To tail production logs on all servers (default mode):
+
+```
+$ npm run xpr:logs
+```
+
+To view all logs on all servers in some other environment:
+
+```
+$ npm run xpr:logs epistage
+```
+
+To view all logs on a specific server:
+
+```
+$ npm run xpr:logs production xpr-p-app101
+```
