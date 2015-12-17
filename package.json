@@ -28,6 +28,7 @@
   },
   "bin": {
     "exp-containership": "scripts/exp-containership.sh",
-    "exp-containerdeploy": "scripts/exp-containerdeploy.js"
+    "exp-containerdeploy": "scripts/exp-containerdeploy.js",
+    "exp-logs": "scripts/exp-logs.sh"	
   }
 }
