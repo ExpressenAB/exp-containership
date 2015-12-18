@@ -143,7 +143,8 @@ To define deploy hooks, we utilize the pre/post feature built into the npm scrip
 
 ## Log tailing
 
-You can conveniently tail log files in different environments using the log script included with exp-containership. Just make sure to add the following script entry to your package.json:
+You can conveniently tail log files in different environments using the log script included with exp-containership. It will use ssh to connect to the servers, so make sure to setup passwordless login or you'll risk loosing your mind from repeated username/password typing. 
+First make sure to add the following script entry to your package.json:
 
 ```
 "scripts": {
