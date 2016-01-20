@@ -81,6 +81,19 @@ http://[environment].[your-app-name].service.consul.xpr.dex.nu/
 ```
 For example "http://production.ursula.service.consul.xpr.dex.nu/".
 
+If you need to target a specific container for your requests, add the header `X-Use-Backend: <host>`. This will work for all requests originating from our internal networks, internal requests will also include a header `X-Backend` containing the host that responded:
+```
+$ curl [environment].[your-app-name].service.consul.xpr.dex.nu/ -H "X-Use-Backend:xpr-x-xxxxxx" -I
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Content-Length: 162
+ETag: W/"a2-6mYB55N2FatfgCGXbEYdxw"
+Vary: Accept-Encoding
+Date: Wed, 20 Jan 2016 15:02:48 GMT
+X-Backend: xpr-x-xxxxxxx_20108
+X-Request-ID: 0A1F66C9:C127_0A328C0B:0050_569FA198_0A9D:8CA4
+```
+
 ##### ssh
 
 Run the "xpr:status" npm script for the concerned environment. The output will tell you which servers are hosting your app.
