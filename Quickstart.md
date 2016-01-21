@@ -22,8 +22,8 @@ In the same folder, issue:
 % node_modules/.bin/exp-containership init
 ```
 
-This should exit with an error message telling you how to install docker software.
-After everything is installed, run the command again:
+Exp-containership will notice you don't have docker installed and open up a tab in your browser with download instructions.
+After everything is installed (it will take a while...), run the command again:
 
 ```
 % node_modules/.bin/exp-containership init
