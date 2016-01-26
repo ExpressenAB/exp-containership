@@ -47,7 +47,7 @@ Save the script locally as "passless.sh" and the use it to enable passwordless l
 For example:
 
 ```
-$ for n in {1..6}; sh passless.sh "your.username@xpr-p-app10${n}.sth.basefarm.net" ; done
-$ for n in {1..2}; sh passless.sh "your.username@xpr-t-test10${n}.sth.basefarm.net" ; done
+$ for n in {1..6}; do sh passless.sh "your.username@xpr-p-app10${n}.sth.basefarm.net" ; done
+$ for n in {1..2}; do sh passless.sh "your.username@xpr-t-test10${n}.sth.basefarm.net" ; done
 
 ```
