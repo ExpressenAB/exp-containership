@@ -27,11 +27,8 @@ function logVerbose(format, args) {
 
 function loadRevision(cb) {
   exec('git rev-parse --short HEAD', function(err, stdout) {
-    if (err) {
-      cb(err);
-    } else {
-      cb(null, { revision: _.trim(stdout) });
-    }
+    if (err) return cb(err);
+    cb(null, { revision: _.trim(stdout) });
   });
 }
 
@@ -39,15 +36,10 @@ function deleteAuthToken (cb) {
   fs.exists(tokenFile, function (exists) {
     if (exists) {
       fs.unlink(tokenFile, function (err) {
-        if (err) {
-          cb(err);
-        } else {
-          cb(null, {});
-        }
+        if (err) return cb(err);
       });
-    } else {
-      cb(null, {});
     }
+    cb(null, {});
   });
 }
 
@@ -57,14 +49,11 @@ function loadJob(state, cb) {
     fs.exists(jobFile, function (exists) {
       if (exists) {
         fs.readFile(jobFile, { encoding: 'utf8' }, function (err, data) {
-          if (err) {
-            cb(err);
+          if (err) return cb(err);
+          if (!program.nojobmerge && process.env['npm_package_config_exp_containership_nojobmerge'] !== 'true') {
+            cb(null, _.assign(state, { job: _.merge(_.cloneDeep(heliosJob), JSON.parse(data)) }));
           } else {
-            if (!program.nojobmerge && process.env['npm_package_config_exp_containership_nojobmerge'] !== 'true') {
-              cb(null, _.assign(state, { job: _.merge(_.cloneDeep(heliosJob), JSON.parse(data)) }));
-            } else {
-              cb(null, _.assign(state, { job: JSON.parse(data) }));
-            }
+            cb(null, _.assign(state, { job: JSON.parse(data) }));            
           }
         });
       } else {
@@ -78,11 +67,8 @@ function loadJob(state, cb) {
 
 function loadCaCert(state, cb) {
   fs.readFile(program.ca, { encoding: 'utf8' }, function (err, data) {
-    if (err) {
-      cb(err);
-    } else {
-      cb(null, _.assign(state, { ca: data }));
-    }
+    if (err) return cb(err);
+    cb(null, _.assign(state, { ca: data }));
   });
 }
 
@@ -90,14 +76,11 @@ function loadAuthToken (state, cb) {
   fs.exists(tokenFile, function (exists) {
     if (exists) {
       fs.readFile(tokenFile, { encoding: 'utf8' }, function (err, data) {
-        if (err) {
-          cb(err);
-        } else {
-          cb(null, _.assign(state, { token: data }));
-        }
+        if (err) return cb(err);
+        cb(null, _.assign(state, { token: data }));
       });
     } else {
-      cb(null, _.assign(state, { token: null }))
+      cb(null, _.assign(state, { token: null }));
     }
   });
 }
@@ -117,22 +100,18 @@ function login(state, cb) {
         required: true,
         hidden: true
       }], function (err, result) {
-        if (err) {
-          cb(err);
-        } else {
-          request
-            .post({ url: program.api + '/login', agentOptions: { ca: state.ca } })
-            .form({ username: result.username, password: result.password, eauth: program.eauth })
-            .on('response', function(response) {
-              if (response.statusCode === 200) {
-                cb(null, _.assign(state, { token: response.headers['x-auth-token'] }));
-              } else {
-                console.log('Unable to login, check your credentials'.red);
-                login(state, cb);
-              }
-            })
-            .on('error', cb);
-        }
+        if (err) return cb(err);
+        request
+          .post({ url: program.api + '/login', agentOptions: { ca: state.ca } })
+          .form({ username: result.username, password: result.password, eauth: program.eauth })
+          .on('response', function(response) {
+            if (response.statusCode === 200) {
+              cb(null, _.assign(state, { token: response.headers['x-auth-token'] }));
+            } else {
+              console.log('Unable to login, check your credentials'.red);
+              login(state, cb);
+            }
+          }).on('error', cb);
       });
   } else {
     cb(null, state);
@@ -143,98 +122,52 @@ function saveAuthToken(state, cb) {
   var dir = path.dirname(tokenFile);
   fs.mkdir(dir, function () {
     fs.writeFile(tokenFile, state.token, function (err) {
-      if (err) {
-        cb(err);
-      } else {
-        cb(null, state);
-      }
+      if (err) return cb(err);
+      cb(null, state);
     });
   });
 }
 
-function execOrchestrate(options, filter, cb) {
-  if (_.isFunction(filter)) {
-    cb = filter;
-    filter = null;
-  }
+function execSalt(saltFunction, saltArgs, ca, token, cb) {
   var message = messages.randomMessage();
   var spinner = new Spinner('Please wait -- ' + message +
         (_.endsWith(message, '?') || _.endsWith(message, '!') ? ' %s' : '... %s'));
   var agentOptions = {};
   if (!program.insecure && process.env['npm_package_config_exp_containership_insecure'] !== 'true') {
-    agentOptions.ca = options.ca;
+    agentOptions.ca = ca;
   }
-  logVerbose('Orchestrate request: %s', [JSON.stringify(options.body, undefined, 2)]);
   spinner.start();
-  request({
+  var req = {
     method: "POST",
     url: program.api,
     agentOptions: agentOptions,
     headers: {
-      "X-Auth-Token": options.token,
+      "X-Auth-Token": token,
       "Accept": "application/json"
     },
-    json: options.body
-  }, function (err, response, body) {
+    json: {
+      client: 'local',
+      tgt: 'xpr-p-log103*',
+      fun: saltFunction,
+      arg: saltArgs
+    }
+  };
+  logVerbose('Salt request: %s', [JSON.stringify(req, undefined, 2)]);
+  request(req, function (err, response, body) {
     spinner.stop(true);
-    if (err) {
-      logVerbose('Orchestrate error: %s', [err]);
-      if (err.code == 'ECONNREFUSED') {
-        cb(new Error('Error contacting the Salt API endpoint'));
-      } else {
-        cb(err);
-      }
-    } else if (response.statusCode === 200) {
-      logVerbose('Orchestrate response: %s', [JSON.stringify(body, undefined, 2)]);
-
-      var statements = _.reduce(_.flatten(_.map(body.return, function (node) {
-        return _.values(node);
-      })), function (result, statement) {
-        return _.assign(result || {}, statement);
-      });
-
-      logVerbose('Statements: %s', [JSON.stringify(statements, undefined, 2)]);
-
-      var statementName = _.find(_.keys(statements), function (name) {
-        if (filter) {
-          return name.indexOf('_|-' + filter + '_|-') >= 0;
-        } else {
-          return true;
-        }
-      });
-
-      var statement = statements[statementName];
-
-      logVerbose('Statement: %s', [JSON.stringify(statement, undefined, 2)]);
-
-      if (!statement || !statement.changes) {
-        return cb(new Error('Invalid response from API'));
-      }
-
-      var changes = statement.changes;
-      var results = _.map(changes.ret, function (v, k) {
-        try {
-          return JSON.parse(v);
-        } catch (e) {
-          return v;
-        }
-      });
-      cb(null, _.assign(options, {
-        body: body,
-        results: results,
-        response: response
-      }));
+    if (err) return cb(err);
+    if (response.statusCode === 200) {
+      logVerbose('Salt response: %s', [JSON.stringify(body, undefined, 2)]);
+      var result = body.return[0];
+      cb(null, result[Object.keys(result)[0]]);
     } else if (response.statusCode === 401) {
       async.waterfall([deleteAuthToken, loadCaCert, login, saveAuthToken],
-        function (err, result) {
-          if (err) {
-            cb(err);
-          } else {
-            execOrchestrate(_.assign(options, { token: result.token }), cb);
-          }
-        });
+                      function (err, result) {
+                        if (err) return cb(err);
+                        execSalt(saltFunction, saltArgs, ca, result.token, cb);
+                      });
     } else {
-      cb(new Error('Unknown error returned by API'));
+      cb(new Error('Unknown error returned by Salt API'));
     }
   });
 }
