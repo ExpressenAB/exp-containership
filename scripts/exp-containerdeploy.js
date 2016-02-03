@@ -27,11 +27,8 @@ function logVerbose(format, args) {
 
 function loadRevision(cb) {
   exec('git rev-parse --short HEAD', function(err, stdout) {
-    if (err) {
-      cb(err);
-    } else {
-      cb(null, { revision: _.trim(stdout) });
-    }
+    if (err) return cb(err);
+    cb(null, { revision: _.trim(stdout) });
   });
 }
 
@@ -39,15 +36,10 @@ function deleteAuthToken (cb) {
   fs.exists(tokenFile, function (exists) {
     if (exists) {
       fs.unlink(tokenFile, function (err) {
-        if (err) {
-          cb(err);
-        } else {
-          cb(null, {});
-        }
+        if (err) return cb(err);
       });
-    } else {
-      cb(null, {});
     }
+    cb(null, {});
   });
 }
 
@@ -57,14 +49,11 @@ function loadJob(state, cb) {
     fs.exists(jobFile, function (exists) {
       if (exists) {
         fs.readFile(jobFile, { encoding: 'utf8' }, function (err, data) {
-          if (err) {
-            cb(err);
+          if (err) return cb(err);
+          if (!program.nojobmerge && process.env['npm_package_config_exp_containership_nojobmerge'] !== 'true') {
+            cb(null, _.assign(state, { job: _.merge(_.cloneDeep(heliosJob), JSON.parse(data)) }));
           } else {
-            if (!program.nojobmerge && process.env['npm_package_config_exp_containership_nojobmerge'] !== 'true') {
-              cb(null, _.assign(state, { job: _.merge(_.cloneDeep(heliosJob), JSON.parse(data)) }));
-            } else {
-              cb(null, _.assign(state, { job: JSON.parse(data) }));
-            }
+            cb(null, _.assign(state, { job: JSON.parse(data) }));            
           }
         });
       } else {
@@ -78,11 +67,8 @@ function loadJob(state, cb) {
 
 function loadCaCert(state, cb) {
   fs.readFile(program.ca, { encoding: 'utf8' }, function (err, data) {
-    if (err) {
-      cb(err);
-    } else {
-      cb(null, _.assign(state, { ca: data }));
-    }
+    if (err) return cb(err);
+    cb(null, _.assign(state, { ca: data }));
   });
 }
 
@@ -90,14 +76,11 @@ function loadAuthToken (state, cb) {
   fs.exists(tokenFile, function (exists) {
     if (exists) {
       fs.readFile(tokenFile, { encoding: 'utf8' }, function (err, data) {
-        if (err) {
-          cb(err);
-        } else {
-          cb(null, _.assign(state, { token: data }));
-        }
+        if (err) return cb(err);
+        cb(null, _.assign(state, { token: data }));
       });
     } else {
-      cb(null, _.assign(state, { token: null }))
+      cb(null, _.assign(state, { token: null }));
     }
   });
 }
@@ -117,22 +100,18 @@ function login(state, cb) {
         required: true,
         hidden: true
       }], function (err, result) {
-        if (err) {
-          cb(err);
-        } else {
-          request
-            .post({ url: program.api + '/login', agentOptions: { ca: state.ca } })
-            .form({ username: result.username, password: result.password, eauth: program.eauth })
-            .on('response', function(response) {
-              if (response.statusCode === 200) {
-                cb(null, _.assign(state, { token: response.headers['x-auth-token'] }));
-              } else {
-                console.log('Unable to login, check your credentials'.red);
-                login(state, cb);
-              }
-            })
-            .on('error', cb);
-        }
+        if (err) return cb(err);
+        request
+          .post({ url: program.api + '/login', agentOptions: { ca: state.ca } })
+          .form({ username: result.username, password: result.password, eauth: program.eauth })
+          .on('response', function(response) {
+            if (response.statusCode === 200) {
+              cb(null, _.assign(state, { token: response.headers['x-auth-token'] }));
+            } else {
+              console.log('Unable to login, check your credentials'.red);
+              login(state, cb);
+            }
+          }).on('error', cb);
       });
   } else {
     cb(null, state);
@@ -143,98 +122,52 @@ function saveAuthToken(state, cb) {
   var dir = path.dirname(tokenFile);
   fs.mkdir(dir, function () {
     fs.writeFile(tokenFile, state.token, function (err) {
-      if (err) {
-        cb(err);
-      } else {
-        cb(null, state);
-      }
+      if (err) return cb(err);
+      cb(null, state);
     });
   });
 }
 
-function execOrchestrate(options, filter, cb) {
-  if (_.isFunction(filter)) {
-    cb = filter;
-    filter = null;
-  }
+function execSalt(saltFunction, saltArgs, ca, token, cb) {
   var message = messages.randomMessage();
   var spinner = new Spinner('Please wait -- ' + message +
         (_.endsWith(message, '?') || _.endsWith(message, '!') ? ' %s' : '... %s'));
   var agentOptions = {};
   if (!program.insecure && process.env['npm_package_config_exp_containership_insecure'] !== 'true') {
-    agentOptions.ca = options.ca;
+    agentOptions.ca = ca;
   }
-  logVerbose('Orchestrate request: %s', [JSON.stringify(options.body, undefined, 2)]);
   spinner.start();
-  request({
+  var req = {
     method: "POST",
     url: program.api,
     agentOptions: agentOptions,
     headers: {
-      "X-Auth-Token": options.token,
+      "X-Auth-Token": token,
       "Accept": "application/json"
     },
-    json: options.body
-  }, function (err, response, body) {
+    json: {
+      client: 'local',
+      tgt: 'xpr-p-log103*',
+      fun: saltFunction,
+      arg: saltArgs
+    }
+  };
+  logVerbose('Salt request: %s', [JSON.stringify(req, undefined, 2)]);
+  request(req, function (err, response, body) {
     spinner.stop(true);
-    if (err) {
-      logVerbose('Orchestrate error: %s', [err]);
-      if (err.code == 'ECONNREFUSED') {
-        cb(new Error('Error contacting the Salt API endpoint'));
-      } else {
-        cb(err);
-      }
-    } else if (response.statusCode === 200) {
-      logVerbose('Orchestrate response: %s', [JSON.stringify(body, undefined, 2)]);
-
-      var statements = _.reduce(_.flatten(_.map(body.return, function (node) {
-        return _.values(node);
-      })), function (result, statement) {
-        return _.assign(result || {}, statement);
-      });
-
-      logVerbose('Statements: %s', [JSON.stringify(statements, undefined, 2)]);
-
-      var statementName = _.find(_.keys(statements), function (name) {
-        if (filter) {
-          return name.indexOf('_|-' + filter + '_|-') >= 0;
-        } else {
-          return true;
-        }
-      });
-
-      var statement = statements[statementName];
-
-      logVerbose('Statement: %s', [JSON.stringify(statement, undefined, 2)]);
-
-      if (!statement || !statement.changes) {
-        return cb(new Error('Invalid response from API'));
-      }
-
-      var changes = statement.changes;
-      var results = _.map(changes.ret, function (v, k) {
-        try {
-          return JSON.parse(v);
-        } catch (e) {
-          return v;
-        }
-      });
-      cb(null, _.assign(options, {
-        body: body,
-        results: results,
-        response: response
-      }));
+    if (err) return cb(err);
+    if (response.statusCode === 200) {
+      logVerbose('Salt response: %s', [JSON.stringify(body, undefined, 2)]);
+      var result = body.return[0];
+      cb(null, result[Object.keys(result)[0]]);
     } else if (response.statusCode === 401) {
       async.waterfall([deleteAuthToken, loadCaCert, login, saveAuthToken],
-        function (err, result) {
-          if (err) {
-            cb(err);
-          } else {
-            execOrchestrate(_.assign(options, { token: result.token }), cb);
-          }
-        });
+                      function (err, result) {
+                        if (err) return cb(err);
+                        execSalt(saltFunction, saltArgs, ca, result.token, cb);
+                      });
     } else {
-      cb(new Error('Unknown error returned by API'));
+      cb(new Error('Unknown error returned by Salt API'));
     }
   });
 }
@@ -289,59 +222,12 @@ function serviceUrl(app) {
 
 var tasks = [loadRevision, loadCaCert, loadAuthToken, login, saveAuthToken, loadJob];
 
-program
-  .command('status [group]')
-  .description('prints the deployment group status')
-  .action(function (group, options) {
-    group = ensure_group(null, group);
-
-    tasks.push(function (state, cb) {
-      execOrchestrate(_.assign(state, {
-        body: {
-          client: 'runner',
-          fun: 'state.orchestrate',
-          mods: 'orchestrate.status_helios_deployment_group',
-          pillar: {
-            deploymentGroup: group
-          }
-        }
-      }), function (err, state) {
-        if (err) {
-          cb(err);
-        } else {
-          _.each(state.results, function (result) {
-            var status = result.deploymentGroupStatus;
-            if (status) {
-              var appName = result.deploymentGroup.name.substring(0, result.deploymentGroup.name.lastIndexOf('-'));
-              printTable({
-                Name: result.deploymentGroup.name,
-                URL: serviceUrl(appName),
-                "Host Selectors": _(_.map(result.deploymentGroup.hostSelectors, function (v) {
-                  return v.label + ' ' + v.operator.yellow + ' ' + v.operand;
-                })).join('\n'),
-                "Job ID": result.deploymentGroup.jobId,
-                State: stateColor(status.state)
-              });
-
-              printTable(_.map(result.hostStatuses, function (s) {
-                return [s.host, (s.jobId || ''), stateColor(s.state)];
-              }), ['Host','Job ID','State']);
-            } else {
-              cb(new Error('Invalid deployment group: ' + group));
-            }
-          });
-
-          cb(null, state);
-        }
-      });
-    });
-  });
-
 function errExit(msg) {
   console.error(("ERROR: " + msg).red);
   process.exit(1);
 }
 
+// TODO rename
 function ensure_app(app) {
   var app = app || process.env['npm_package_name'];
   if (!app) {
@@ -358,59 +244,49 @@ function ensure_group(app, group) {
   return group || envGroup || ensure_app(app) + "-" + program.environment;
 }
 
+function jobName(app, env, rev) {
+  return app + '-' + env + ":" + rev;
+}
+
 program
-  .command('jobs [revision] [app]')
-  .description('lists all jobs for the deployment group')
-  .action(function (rev, app, options) {
-    app = ensure_app(app) + '-' + program.environment;
-
-    if (!_.isEmpty(rev)) {
-      app = app + ':' + rev;
-    }
-
+  .command('status [group]')
+  .description('prints the deployment group status')
+  .action(function (group) {
+    group = ensure_group(null, group);
     tasks.push(function (state, cb) {
-      execOrchestrate(_.assign(state, {
-        body: {
-          client: 'runner',
-          fun: 'state.orchestrate',
-          mods: 'orchestrate.get_helios_job',
-          pillar: {
-            deployUser: program.user,
-            appName: app
-          }
-        }
-      }), function (err, state) {
-        if (err) {
-          cb(err);
-        } else {
-          printTable(_.flatten(_.map(state.results, function (result) {
-            var jobs = _.values(result);
-
-            return _.map(jobs, function (job) {
-              return [
-                job.id,
-                _(_.map(job.ports, function (port, name) {
-                  return name.yellow + '=' +
-                    (port.externalPort || '<auto>') + ':' +
-                    port.internalPort + '/' +
-                    port.protocol;
-                })).join('\n'),
-                job.image,
-                _(_.map(job.env, function (v, env) {
-                  return env.yellow + '=' + v
-                })).join('\n'),
-              ];
-            });
-          })), ['ID', 'Ports', 'Image', 'Environment']);
-          cb(null, state);
-        }
+      execSalt('xpr-deploy.status',[group], state.ca, state.token, function (err, result) {
+        if (err) return cb(err);
+        printTable({
+          Name: result.deploymentGroup.name,
+          "Job Id": result.deploymentGroup.jobId,
+        });
+        printTable(_.map(result.hostStatuses, function (s) {
+          return [s.host, (s.jobId || ''), stateColor(s.state)];
+        }), ['Host','Job ID','State']);
       });
     });
   });
 
-function jobName(app, env, rev) {
-  return app + '-' + env + ":" + rev;
-}
+program
+  .command('jobs [revision] [app]')
+  .description('lists all jobs for the deployment group')
+  .action(function (rev, app) {
+    app = ensure_app(app) + '-' + program.environment;
+    if (!_.isEmpty(rev)) {
+      app = app + ':' + rev;
+    }
+    tasks.push(function (state, cb) {
+      execSalt('xpr-deploy.jobs', [app], state.ca, state.token, function (err, jobs) {
+        if (err) return cb(err);
+        var table = _.map(jobs, function (job) {
+          var jobEnv =  _.map(job.env, function (v, e) {return e.yellow + '=' + v;}).join('\n');
+          return [job.id, job.image, jobEnv];
+        });
+        printTable(table, ['Id', 'Image', 'Environment']);
+        cb(null, state);
+      });
+    });
+  });
 
 program
   .command('open [app]')
@@ -418,16 +294,14 @@ program
   .action(function (app) {
     app = ensure_app(app);
     tasks = [function (cb) {
-      exec('open ' + serviceUrl(app), function (err) {
-        cb(err);
-      });
+      exec('open ' + serviceUrl(app), cb);
     }];
   });
 
 program
   .command('deploy [revision] [app] [group]')
   .description('deploys the specified revision to an environment')
-  .action(function (rev, app, group, options) {
+  .action(function (rev, app, group) {
     app = app || process.env['npm_package_name'];
     tasks.push(function (state, cb) {
       var imageUrl = "https://" + program.repository + "/v1/repositories/" + app + "/tags/" + state.revision;
@@ -465,66 +339,16 @@ program
           "/home/web/.pm2/logs:rw" : path.join('/var/log/containers', program.environment, app)
         }
       }, state.job);
-      logVerbose("Helios job def: " + JSON.stringify(job, undefined, 2));
-      execOrchestrate(_.assign(state, {
-        body: {
-          client: 'runner',
-          fun: 'state.orchestrate',
-          mods: 'orchestrate.create_helios_job',
-          pillar: {
-            name: app,
-            job: jobName(app, program.environment, rev),
-            deployUser: program.user,
-            image: program.repository + '/' + app + ':' + rev,
-            job_def: new Buffer(JSON.stringify(job)).toString('base64'),
-            env: {}
-          }
-        }
-      }), function (err, state) {
-        if (err) {
-          cb(err);
-        } else {
-          cb(null, state);
-        }
-      });
-    });
-
-    tasks.push(function (state, cb) {
-      app = ensure_app(app);
-      rev = rev || state.revision;
-      execOrchestrate(_.assign(state, {
-        body: {
-          client: 'runner',
-          fun: 'state.orchestrate',
-          mods: 'orchestrate.deploy_helios_v0_2',
-          pillar: {
-            job: jobName(app, program.environment, rev),
-            deployUser: program.user,
-            deploymentGroup: group,
-            app: app,
-            environment: program.environment,
-            revision: rev,
-            ts: (new Date()).getTime() / 1000
-          }
-        }
-      }), 'deploy_helios_job', function (err, state) {
-        if (err) {
-          cb(err);
-        } else {
-          var result = _.first(state.results);
-
-          if (result) {
-            printTable({
-              Status: stateColor(result.status),
-              Parallelism: result.parallelism,
-              Duration: result.duration,
-              Timeout: result.timeout
-            });
-            cb(null, state);
-          } else {
-            cb(new Error('Invalid response returned by API'));
-          }
-        }
+      var jobId = jobName(app, program.environment, rev);
+      var image = program.repository + '/' + app + ':' + rev;
+      var jobDef = new Buffer(JSON.stringify(job)).toString('base64');
+      var saltArgs = [app, program.environment, rev, jobDef, image, group, program.user];
+      logVerbose("Job def: ", JSON.stringify(job, null, 2));
+      execSalt('xpr-deploy.deploy', saltArgs, state.ca, state.token, function (err, result) {
+        if (err) return cb(err);
+        result.status = stateColor(result.status);
+        printTable(result);
+        cb(null, state);
       });
     });
   });
@@ -532,32 +356,15 @@ program
 program
   .command('undeploy [revision] [app] [group]')
   .description('undeploys the job from the specified environment')
-  .action(function (rev, app, group, options) {
+  .action(function (rev, app, group) {
     tasks.push(function (state, cb) {
       app = ensure_app(app);
       group = ensure_group(app, group);
       rev = rev || state.revision;
-
-      execOrchestrate(_.assign(state, {
-        body: {
-          client: 'runner',
-          fun: 'state.orchestrate',
-          mods: 'orchestrate.undeploy_helios_job',
-          pillar: {
-            job: jobName(app, program.environment, rev),
-            deployUser: program.user,
-            deploymentGroup: group
-          }
-        }
-      }), function (err, state) {
-        if (err) {
-          cb(err);
-        } else {
-          _.each(state.results, function (r) {
-            console.log(r.green);
-          });
-          cb(null, state);
-        }
+      execSalt('xpr-deploy.undeploy', [group, program.user], state.ca, state.token, function (err) {
+        if (err) return cb(err);
+        console.log("Undeploy finished. Reply from backend was: GR8 SUCCESS");
+        cb(null, state);
       });
     });
   });
