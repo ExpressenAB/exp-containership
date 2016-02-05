@@ -48,11 +48,12 @@ Add entries to the scripts section to define your exp-containership tasks.
   "xpr:reset": "exp-containership reset",
   "xpr:build": "exp-containership build",
   "xpr:start": "exp-containership run",
-  "xpr:prepush": "exp-ensure-unmodified && exp-ensure-master",
-  "xpr:push": "exp-containership test && exp-containership push",
+  "xpr:push": "exp-containership push",
+  "prexpr:push": "exp-ensure-unmodified && exp-ensure-master && exp-ensure-container-tests",
   "xpr:jobs": "exp-containerdeploy jobs -e",
   "xpr:status": "exp-containerdeploy status -e",
-  "xpr:deploy": "exp-containership test && exp-containerdeploy deploy -e",
+  "xpr:deploy": "exp-containerdeploy deploy -e",
+  "prexpr:deploy": "exp-ensure-unmodified && exp-ensure-master && exp-ensure-container-tests",
   "xpr:undeploy": "exp-containerdeploy undeploy -e",
   "xpr:open": "exp-containership open",
   "xpr:test": "exp-containership test",
@@ -136,6 +137,7 @@ To define deploy hooks, we utilize the pre/post feature built into the npm scrip
 * ``exp-ensure-unmodified`` - ensures that everything is commited to git
 * ``exp-ensure-master`` - ensure that we deploy only from the master branch.
 * ``exp-ensure-tests`` - ensure that all tests are running.
+* ``exp-ensure-container-tests`` - ensures that everything is commited to git
 
 #### Post
 

@@ -24,13 +24,13 @@ elif [ "$1" == "build" ]; then
     build=1
 # Legacy stuff, test targets should be defined using "exec" in package.json
 elif [ "$1" == "test" ]; then
-    build=1
     exec=1
     service="web"
     exec_cmd="cd /exp-container/app && npm install && npm test"
 elif [ "$1" == "prebuild" ]; then
     prebuild=1
 elif [ "$1" == "push" ]; then
+    build=1
     push=1
 elif [ "$1" == "run" ]; then
     run=1
