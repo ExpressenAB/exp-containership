@@ -341,7 +341,7 @@ program
       }, state.job);
       var jobId = jobName(app, program.environment, rev);
       var image = program.repository + '/' + app + ':' + rev;
-      var jobDef = new Buffer(JSON.stringify(job)).toString('base64');
+      var jobDef = new Buffer(JSON.stringify(job)).toString('hex');
       var saltArgs = [app, program.environment, rev, jobDef, image, group, program.user];
       logVerbose("Job def: ", JSON.stringify(job, null, 2));
       execSalt('xpr-deploy.deploy', saltArgs, state.ca, state.token, function (err, result) {
