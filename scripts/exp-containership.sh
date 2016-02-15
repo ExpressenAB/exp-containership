@@ -91,7 +91,7 @@ if [ $init == 1 ]; then
       eval $(docker-machine env --shell bash "${machine_name}")
   elif [ "${kernel}" != "Linux" ]; then
     echo "Need Docker Machine to proceed, please install Docker Toolbox and run this script again"
-    open "https://www.docker.com/toolbox"
+    open "https://github.com/docker/toolbox/releases/tag/v1.9.1j"
     exit 1
   fi
 
