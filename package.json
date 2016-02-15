@@ -1,6 +1,6 @@
 {
   "name": "exp-containership",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Build and deploy applications as containers.",
   "author": "AB Kvällstidningen Expressen",
   "license": {
@@ -30,6 +30,6 @@
     "exp-containership": "scripts/exp-containership.sh",
     "exp-containerdeploy": "scripts/exp-containerdeploy.js",
     "exp-ensure-container-tests": "scripts/ensure-container-tests.sh",
-    "exp-logs": "scripts/exp-logs.sh"	
+    "exp-logs": "scripts/exp-logs.sh"
   }
 }
