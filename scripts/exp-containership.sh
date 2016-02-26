@@ -69,6 +69,7 @@ if [ $init == 1 ]; then
           echo "Creating docker machine..."
           docker-machine create \
             --driver virtualbox \
+            --virtualbox-cpu-count "4" \
             --virtualbox-memory "2048" \
             --virtualbox-disk-size "40000" \
             "${machine_name}" >/dev/null
