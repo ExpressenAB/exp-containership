@@ -4,7 +4,7 @@
 
 Talk to your local infrastructure team to ensure you have all of these:
 
-* Url:s etc to any external services your app uses for the concerned envirnoment(s).
+* Url:s etc to any external services your app uses for the concerned environment(s).
 * A helios deployment group for each environment you want to deploy to. 
 * Access to the salt master
 * Ssh access to physical machines.
