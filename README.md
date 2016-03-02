@@ -63,7 +63,7 @@ Add entries to the scripts section to define your exp-containership tasks.
 ```
 #### Custom pm2 config (optional)
 
-If the pm2 config shipped with the base image (found [here](https://github.com/ExpressenAB/node-starterapp/blob/infra/dockerize/docker/exec/app.json) and [here](https://github.com/ExpressenAB/node-starterapp/blob/infra/dockerize/docker/exec/dev_app.json)) does not suit your needs, you can specify your own. Add two files called `config/app.json` and `config/dev_app.json` to your application. The former will be used as pm2 config when running your app on your local development machine, the latter will be used in all other environments ("livedata", "production" etc).
+If the pm2 config shipped with the base image (found [here](https://github.com/ExpressenAB/node-starterapp/blob/infra/dockerize/docker/exec/app.json) and [here](https://github.com/ExpressenAB/node-starterapp/blob/infra/dockerize/docker/exec/dev_app.json)) does not suit your needs, you can specify your own. Add two files called `config/dev_app.json` and `config/app.json` to your application. The former will be used as pm2 config when running your app on your local development machine, the latter will be used in all other environments ("livedata", "production" etc).
 
 You then overwrite the original pm2 config by adding the following line where you prefer in your `Dockerfile`:
 
