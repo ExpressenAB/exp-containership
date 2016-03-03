@@ -71,7 +71,7 @@ if [ $init == 1 ]; then
             --driver virtualbox \
             --virtualbox-cpu-count "4" \
             --virtualbox-memory "2048" \
-            --virtualbox-disk-size "40000" \
+            --virtualbox-disk-size "100000" \
             "${machine_name}" >/dev/null
           if [ -e "${home}" ]; then
             docker-machine stop "${machine_name}" >/dev/null
