@@ -53,7 +53,7 @@ function loadJob(state, cb) {
           if (!program.nojobmerge && process.env['npm_package_config_exp_containership_nojobmerge'] !== 'true') {
             cb(null, _.assign(state, { job: _.merge(_.cloneDeep(heliosJob), JSON.parse(data)) }));
           } else {
-            cb(null, _.assign(state, { job: JSON.parse(data) }));            
+            cb(null, _.assign(state, { job: JSON.parse(data) }));
           }
         });
       } else {
@@ -330,7 +330,9 @@ program
           SERVICE_NAME: app,
           SERVICE_TAGS: rev + ',' + program.environment,
           NODE_ENV : program.environment,
-          VERSION: rev
+          VERSION: rev,
+          DEPLOYMENT_USER: program.user,
+          DEPLOYMENT_DATE: new Date()
         },
         volumes: {
           "/exp-container/logs:rw" : path.join('/var/log/containers', program.environment, app),
