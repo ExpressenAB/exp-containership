@@ -30,6 +30,7 @@
     "exp-containership": "scripts/exp-containership.sh",
     "exp-containerdeploy": "scripts/exp-containerdeploy.js",
     "exp-ensure-container-tests": "scripts/ensure-container-tests.sh",
-    "exp-logs": "scripts/exp-logs.sh"
+    "exp-logs": "scripts/exp-logs.sh",
+    "unpublished-changes": "scripts/unpublished-changes.sh"
   }
 }

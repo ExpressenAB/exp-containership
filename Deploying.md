@@ -21,7 +21,8 @@ There are a lot of new things to take in so don't worry if you don't understand 
   ...
 
   "xpr:status": "exp-containerdeploy status -e",
-  "xpr:deploy": "exp-containerdeploy deploy -e"
+  "xpr:deploy": "exp-containerdeploy deploy -e",
+  "xpr:unpublished-changes": "unpublished-changes"
   
 }
 ```
@@ -30,8 +31,15 @@ There are a lot of new things to take in so don't worry if you don't understand 
 
 NOTE: For the sake of simplicity we will use the "production" environment in all examples from here on. This can of course be replaced with whatever environment your are working on.
 
-Issue the following command to deploy your app:
+First, determine which changes would be deployed by running:
 
+```
+npm run xpr:unpublished-changes production
+```
+
+This will show the commits in the current git branch that are not currently deployed.
+
+Issue the following command to deploy your app:
 
 ```
 $ npm run xpr:deploy production
