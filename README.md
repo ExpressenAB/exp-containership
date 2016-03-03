@@ -58,7 +58,8 @@ Add entries to the scripts section to define your exp-containership tasks.
   "xpr:open": "exp-containership open",
   "xpr:test": "exp-containership test",
   "xpr:shell": "exp-containership exec web bash",
-  "xpr:logs": "exp-logs"
+  "xpr:logs": "exp-logs",
+  "xpr:unpublished-changes": "unpublished-changes"
 }
 ```
 #### Custom pm2 config (optional)
