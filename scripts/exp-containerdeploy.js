@@ -304,7 +304,7 @@ program
   .action(function (rev, app, group) {
     app = app || process.env['npm_package_name'];
     tasks.push(function (state, cb) {
-      var imageUrl = "https://" + program.repository + "/v1/repositories/" + app + "/tags/" + state.revision;
+      var imageUrl = "https://" + program.repository + "/v2/" + app + "/manifests/" + state.revision;
       request(imageUrl, function (err, resp) {
         if (err || resp.statusCode !== 200) {
           // No image in repo lets push one, if it fails this call will throw.
