@@ -268,6 +268,22 @@ program
   });
 
 program
+  .command('registerlb [app]')
+  .description('Setup or show loadbalancing config')
+  .action(function (app) {
+    app = ensure_app(app);
+    tasks.push(function (state, cb) {
+      execSalt('xpr-deploy.consul_config',[app, program.environment], state.ca, state.token, function (err, result) {
+        if (err) return cb(err);
+        result = JSON.parse(result);
+        printTable(_.forEach(result, function (v, k) {
+          return [v];
+        }), ['Key','Value']);
+      });
+    });
+  });
+
+program
   .command('jobs [revision] [app]')
   .description('lists all jobs for the deployment group')
   .action(function (rev, app) {

@@ -5,11 +5,11 @@
 Talk to your local infrastructure team to ensure you have all of these:
 
 * Url:s etc to any external services your app uses for the concerned environment(s).
-* A helios deployment group for each environment you want to deploy to. 
+* A helios deployment group for each environment you want to deploy to.
 * Access to the salt master
 * Ssh access to physical machines.
 * An "/_alive" http endpoint in your application, returning "Yes".
-* A port and a backend service name in consul (if your app exposes an http endpoint).
+* A port and a backend service name in consul (if your app exposes an http endpoint). This may be created using the `registerlb` command.
 
 There are a lot of new things to take in so don't worry if you don't understand what everything means right now.
 
@@ -22,8 +22,8 @@ There are a lot of new things to take in so don't worry if you don't understand 
 
   "xpr:status": "exp-containerdeploy status -e",
   "xpr:deploy": "exp-containerdeploy deploy -e",
-  "xpr:unpublished-changes": "unpublished-changes"
-  
+  "xpr:unpublished-changes": "unpublished-changes",
+  "xpr:registerlb": "exp-containerdeploy registerlb -e"
 }
 ```
 
@@ -31,7 +31,15 @@ There are a lot of new things to take in so don't worry if you don't understand 
 
 NOTE: For the sake of simplicity we will use the "production" environment in all examples from here on. This can of course be replaced with whatever environment your are working on.
 
-First, determine which changes would be deployed by running:
+To get started, create your loadbalancing config:
+
+```
+$ npm run xpr:registerlb production
+# Repeat this for each environment you need to run your application in, valid envs are: production, livedata, epistage and epitest
+```
+
+
+Then, determine which changes would be deployed by running:
 
 ```
 npm run xpr:unpublished-changes production
@@ -55,13 +63,13 @@ If all goes well, you will be met with the following sight:
 
 ```
 ┌─────────────┬────────┐
-│ Status          DONE   │
+│ Status      |   DONE │
 ├─────────────┼────────┤
-│ Parallelism    1       │
+│ Parallelism    1     │
 ├─────────────┼────────┤
-│ Duration       23.709  │
+│ Duration     23.709  │
 ├─────────────┼────────┤
-│ Timeout        120     │
+│ Timeout      120     │
 └─────────────┴────────┘
 ```
 
@@ -77,13 +85,32 @@ If you want to see the status of your app in any given environment, you can use
 $ npm run xpr:status production
 ```
 
-This will show you on what hardware your app is running and what state it is in. 
+To find out which port your application are running on, run:
+
+```
+$ npm run xpr:registerlb production
+┌──────────────────┬─────────────────────────────────────────────────────────────────────────────────┐
+│ Key              │ Value                                                                           │
+├──────────────────┼─────────────────────────────────────────────────────────────────────────────────┤
+│ config/in/option │ httplog                                                                         │
+│                  │ capture request header Host       len 64                                        │
+├──────────────────┼─────────────────────────────────────────────────────────────────────────────────┤
+│ backends         │ production.susuwatari                                                           │
+├──────────────────┼─────────────────────────────────────────────────────────────────────────────────┤
+│ port             │ 1147                                                                            │
+├──────────────────┼─────────────────────────────────────────────────────────────────────────────────┤
+│ acl              │ xxxxxxx-xxx-xxx-xxxx                                                            │
+└──────────────────┴─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+
+This will show you on what hardware your app is running and what state it is in.
 
 #### 4. Access your app
 
 ##### www
 
-You should now be able to access the www endpoint of your application, if you have one. The adress is on the format: 
+You should now be able to access the www endpoint of your application, if you have one. The adress is on the format:
 ```
 http://[environment].[your-app-name].service.consul.xpr.dex.nu/
 ```
