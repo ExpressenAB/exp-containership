@@ -9,7 +9,7 @@ Talk to your local infrastructure team to ensure you have all of these:
 * Access to the salt master
 * Ssh access to physical machines.
 * An "/_alive" http endpoint in your application, returning "Yes".
-* A port and a backend service name in consul (if your app exposes an http endpoint). This may be created using the `registerlb` command.
+* A port and a backend service name in consul (if your app exposes an http endpoint) and a deployment group. This should be created using the `initdeployment` command.
 
 There are a lot of new things to take in so don't worry if you don't understand what everything means right now.
 
@@ -23,7 +23,7 @@ There are a lot of new things to take in so don't worry if you don't understand 
   "xpr:status": "exp-containerdeploy status -e",
   "xpr:deploy": "exp-containerdeploy deploy -e",
   "xpr:unpublished-changes": "unpublished-changes",
-  "xpr:registerlb": "exp-containerdeploy registerlb -e"
+  "xpr:initdeployment": "exp-containerdeploy initdeployment -e"
 }
 ```
 
@@ -34,7 +34,7 @@ NOTE: For the sake of simplicity we will use the "production" environment in all
 To get started, create your loadbalancing config:
 
 ```
-$ npm run xpr:registerlb production
+$ npm run xpr:initdeployment production
 # Repeat this for each environment you need to run your application in, valid envs are: production, livedata, epistage and epitest
 ```
 

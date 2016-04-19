@@ -244,6 +244,11 @@ function ensure_group(app, group) {
   return group || envGroup || ensure_app(app) + "-" + program.environment;
 }
 
+function ensure_deployment_size() {
+  var envDeploymentSize = environmentConfig('size');
+  return envDeploymentSize || "small";
+}
+
 function jobName(app, env, rev) {
   return app + '-' + env + ":" + rev;
 }
@@ -268,11 +273,16 @@ program
   });
 
 program
-  .command('registerlb [app]')
-  .description('Setup or show loadbalancing config')
+  .command('initdeployment [app]')
+  .description('Create consul configuration and deployment group')
   .action(function (app) {
     app = ensure_app(app);
+    size = ensure_deployment_size();
     tasks.push(function (state, cb) {
+      execSalt('xpr-deploy.create_deployment_group',[app, program.environment, size], state.ca, state.token, function (err, result) {
+        if (err) return cb(err);
+        console.log("Deployment group " + app + "-" + program.environment + " (" + size + ") : " + result.status);
+      });
       execSalt('xpr-deploy.consul_config',[app, program.environment], state.ca, state.token, function (err, result) {
         if (err) return cb(err);
         result = JSON.parse(result);
