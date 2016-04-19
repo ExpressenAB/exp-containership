@@ -273,7 +273,7 @@ program
   });
 
 program
-  .command('initdeployment [app]')
+  .command('init-deployment [app]')
   .description('Create consul configuration and deployment group')
   .action(function (app) {
     app = ensure_app(app);
