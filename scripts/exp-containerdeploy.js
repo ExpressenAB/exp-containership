@@ -274,21 +274,27 @@ program
 
 program
   .command('init-deployment [app]')
-  .description('Create consul configuration and deployment group')
+  .description('Create Consul configuration and Helios deployment group')
   .action(function (app) {
     app = ensure_app(app);
+    group = ensure_group(app, null);
     size = ensure_deployment_size();
     tasks.push(function (state, cb) {
-      execSalt('xpr-deploy.create_deployment_group',[app, program.environment, size], state.ca, state.token, function (err, result) {
-        if (err) return cb(err);
-        console.log("Deployment group " + app + "-" + program.environment + " (" + size + ") : " + result.status);
-      });
       execSalt('xpr-deploy.consul_config',[app, program.environment], state.ca, state.token, function (err, result) {
         if (err) return cb(err);
+        console.log("Consul config:");
         result = JSON.parse(result);
         printTable(_.forEach(result, function (v, k) {
           return [v];
         }), ['Key','Value']);
+      });
+      execSalt('xpr-deploy.create_deployment_group',[group, program.environment, size], state.ca, state.token, function (err, result) {
+        if (err) return cb(err);
+        console.log("Helios deployment group:");
+        var tbl = {};
+        tbl[group] = [result.status, size];
+        printTable(tbl, ["Name", "State", "Size"]);
+        console.log("You will be able to access your application on: http://" + program.environment + "." + app + ".service.consul.xpr.dex.nu on port 80 or \"Port\" above.");
       });
     });
   });
