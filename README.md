@@ -22,6 +22,7 @@ The following configuration options can be set in package.json under `config.exp
 | eauth        | ldap                                       | The Salt eauth type, typically pam or ldap                   |
 | nojobmerge   | false                                      | Whether to merge or overwrite the default helios job config  |
 | environments.[env].helios_deployment_group | `[npm_package_name]-[environment]` (for example `nodefish-production`) | Helios deployment group to use per environment. |
+| size         | small                                      | Size of the deployment group, must be one of <small|medium|large|xlarge> |
 
 Example:
 
@@ -31,7 +32,8 @@ Example:
     "repo": "custom-repo.com",
     "environments": {
       "production": {
-         "helios_deployment_group": "custom-deploymentgroup"
+         "helios_deployment_group": "custom-deploymentgroup",
+         "size": "medium"
       }
     }
   }
@@ -55,6 +57,7 @@ Add entries to the scripts section to define your exp-containership tasks.
   "xpr:deploy": "exp-containerdeploy deploy -e",
   "prexpr:deploy": "exp-ensure-unmodified && exp-ensure-master && exp-ensure-container-tests",
   "xpr:undeploy": "exp-containerdeploy undeploy -e",
+  "xpr:init-deployment": "exp-containership init-deployment -e",
   "xpr:open": "exp-containership open",
   "xpr:test": "exp-containership test",
   "xpr:shell": "exp-containership exec web bash",
