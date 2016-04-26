@@ -78,7 +78,7 @@ This will show you on what hardware your app is running and what state it is in.
 
 #### 4. Access your app
 
-#### Stream log files
+##### Stream log files
 
 To stream all log files for a given environment, do:
 
