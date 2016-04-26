@@ -264,8 +264,9 @@ program
       execSalt('xpr-deploy.status',[group], state.ca, state.token, function (err, result) {
         if (err) return cb(err);
         printTable({
-          Name: result.deploymentGroup.name,
-          "Job Id": result.deploymentGroup.jobId,
+          Status: result.status,
+          Name: _.get(result, "deploymentGroup.name"),
+          "Job Id": _.get(result, "deploymentGroup.jobId")
         });
         printTable(_.map(result.hostStatuses, function (s) {
           return [s.host, (s.jobId || ''), stateColor(s.state)];
