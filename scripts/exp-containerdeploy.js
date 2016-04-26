@@ -201,10 +201,12 @@ function stateColor(state) {
     case 'ROLLING_OUT':
     case 'HEALTHCHECKING':
     case 'STARTING':
+    case 'NOT_MODIFIED':
       return state.yellow;
     case 'DEPLOYMENT_GROUP_NOT_FOUND':
     case 'STOPPED':
     case 'FAILED':
+    case 'CONFLICT':
       return state.red;
     default:
       return (state || '').green;
@@ -292,9 +294,9 @@ program
         if (err) return cb(err);
         console.log("Helios deployment group:");
         var tbl = {};
-        tbl[group] = [result.status, size];
+        tbl[group] = [stateColor(result.status), size];
         printTable(tbl, ["Name", "State", "Size"]);
-        console.log("You will be able to access your application on: http://" + program.environment + "." + app + ".service.consul.xpr.dex.nu on port 80 or \"Port\" above.");
+        console.log("Url: http://" + program.environment + "." + app + ".service.consul.xpr.dex.nu:80 (also \"Port\" above).");
       });
     });
   });
