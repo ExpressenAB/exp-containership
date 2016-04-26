@@ -52,14 +52,22 @@ If all goes well, you will be met with the following sight:
 
 ```
 ┌─────────────┬────────┐
-│ Status      |   DONE │
+│ Status            DONE │
 ├─────────────┼────────┤
-│ Parallelism    1     │
+│ Parallelism     1      │
 ├─────────────┼────────┤
-│ Duration     23.709  │
+│ Duration       23.709  │
 ├─────────────┼────────┤
-│ Timeout      120     │
+│ Timeout        120     │
 └─────────────┴────────┘
+
+┌───────────────┬──────────────────────────────────────────────────────────────────┬─────────┐
+│ Host             Job ID                                                                     State   │
+├───────────────┼──────────────────────────────────────────────────────────────────┼─────────┤
+│ xpr-t-test101    app-environment:86d1606:4a6018b54120d11cc27e1be2ff790219e1be2f4d           RUNNING │
+├───────────────┼──────────────────────────────────────────────────────────────────┼─────────┤
+│ xpr-t-test102     app-environment:86d1606:4a6018b54120d11cc27e1be2ff790219e1be2f4d          RUNNING │
+└───────────────┴──────────────────────────────────────────────────────────────────┴─────────┘
 ```
 
 Otherwise, re-run the command with the '-dd' flag to npm to increase output. Hopefully this will give a hint of what has gone wrong.
