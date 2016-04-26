@@ -383,8 +383,14 @@ program
       execSalt('xpr-deploy.deploy', saltArgs, state.ca, state.token, function (err, result) {
         if (err) return cb(err);
         result.status = stateColor(result.status);
-        printTable(result);
-        cb(null, state);
+        printTable(_.pick(result, ["duration", "status"]));
+        execSalt('xpr-deploy.status',[group], state.ca, state.token, function (err, result) {
+          if (err) return cb(err);
+          printTable(_.map(result.hostStatuses, function (s) {
+            return [s.host, (s.jobId || ''), stateColor(s.state)];
+          }), ['Host','Job ID','State']);
+          return cb(null, state);
+        });
       });
     });
   });
