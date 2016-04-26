@@ -20,7 +20,7 @@ There are a lot of new things to take in so don't worry if you don't understand 
 
   "xpr:status": "exp-containerdeploy status -e",
   "xpr:deploy": "exp-containerdeploy deploy -e",
-  "xpr:unpublished-changes": "unpublished-changes",
+  "xpr:logs": "exp-logs",
   "xpr:init-deployment": "exp-containerdeploy init-deployment -e"
 }
 ```
@@ -77,6 +77,16 @@ $ npm run xpr:status production
 This will show you on what hardware your app is running and what state it is in.
 
 #### 4. Access your app
+
+#### Stream log files
+
+To stream all log files for a given environment, do:
+
+```
+$ npm run xpr:logs production
+```
+
+Hit ctrl-c to abort.
 
 ##### www
 
