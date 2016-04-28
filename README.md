@@ -6,6 +6,8 @@ Newcomers, start here please:
 * [Development quickstart](Quickstart.md#development-super-fun-with-exp-containership)
 * [Deployment quickstart](Deploying.md#deployment-super-fun-with-exp-containership)
 
+Problems look at [issues](#issues)
+
 ## Configuration
 
 All configuration of exp-containership is done right inside your package.json.
@@ -177,4 +179,20 @@ To view all logs on a specific server:
 
 ```
 $ npm run xpr:logs production xpr-p-app101
+```
+
+# Issues
+
+## Certificate issue
+
+Example error message:
+```
+Error checking TLS connection: Error checking and/or regenerating the certs: There was an error validating certificates for host "192.168.99.100:2376": x509: certificate is valid for 192.168.99.101, not 192.168.99.100
+You can attempt to regenerate them using 'docker-machine regenerate-certs [name]'.
+Be advised that this will trigger a Docker daemon restart which will stop running containers.
+```
+
+run: 
+```bash
+docker-machine regenerate-certs -f exp-docker
 ```
