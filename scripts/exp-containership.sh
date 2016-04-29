@@ -48,6 +48,7 @@ fi
 
 # reset
 if [ $reset == 1 ]; then
+    rm -rf tmp/node_modules
     if [ "${kernel}" != "Linux" ]; then
         if (which docker-machine >/dev/null); then
             ls=$(docker-machine ls | grep "${machine_name}") || true
