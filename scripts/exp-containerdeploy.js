@@ -413,6 +413,24 @@ program
   });
 
 program
+  .command('restart [env] [node]')
+  .description('restarts a container in the specified environment and on the specified node')
+  .action(function (env, node) {
+    tasks.push(function (state, cb) {
+      app = ensure_app(undefined);
+      execSalt('xpr-deploy.restart', [app, env, node], state.ca, state.token, function (err, status) {
+        if (err) return cb(err);
+        if (status["error"]) {
+          console.log("Restart failed. Reply from backend was: " + status["error"]);
+        } else {
+          console.log("Restart finished. Reply from backend was: " + status["message"]);
+        }
+        cb(null, state);
+      });
+    });
+  });
+
+program
   .version(pkg.version)
   .option('-e, --environment <name>', 'the environment to run against', 'production')
   .option('-a, --api <url>', 'the salt stack api endpoint url', process.env['npm_package_config_exp_containership_salt'] || 'https://salt-api.service.consul.xpr.dex.nu')
