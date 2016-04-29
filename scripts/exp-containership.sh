@@ -48,7 +48,12 @@ fi
 
 # reset
 if [ $reset == 1 ]; then
+    # node_modules directory linked into dev containers by docker-compose, should
+    # be removed during reset as installed version can sometimes become stale
+    echo "Removing tmp node_modules directorty..."
     rm -rf tmp/node_modules
+    rm -rf tmp/docker_node_modules
+
     if [ "${kernel}" != "Linux" ]; then
         if (which docker-machine >/dev/null); then
             ls=$(docker-machine ls | grep "${machine_name}") || true
