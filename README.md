@@ -57,6 +57,7 @@ Add entries to the scripts section to define your exp-containership tasks.
   "xpr:jobs": "exp-containerdeploy jobs -e",
   "xpr:status": "exp-containerdeploy status -e",
   "xpr:deploy": "exp-containerdeploy deploy -e",
+  "xpr:restart": "exp-containerdeploy restart",
   "prexpr:deploy": "exp-ensure-unmodified && exp-ensure-master && exp-ensure-container-tests",
   "xpr:undeploy": "exp-containerdeploy undeploy -e",
   "xpr:init-deployment": "exp-containerdeploy init-deployment -e",
