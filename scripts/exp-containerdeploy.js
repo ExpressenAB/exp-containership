@@ -384,9 +384,9 @@ program
         printTable({result: stateColor(result.status)});
         if (result.status === "OK") {
           waitForDeploy(jobId, group, state.ca, state.token, undefined, cb);
-	} else {
-	  cb();
-	}
+        } else {
+          cb();
+        }
       });
     });
   });
@@ -394,34 +394,34 @@ program
 function waitForDeploy(jobId, group, ca, token, lastResult, cb) {
   if (lastResult) {
     printTable(_.map(lastResult.hostStatuses, function (s) {
-	    if (_.startsWith(s.jobId, jobId)) {
-		    s.stateColor = stateColor(s.state);
-	    } else {
-	      s.stateColor = (s.state || '').grey;
-		    s.jobId =(s.jobId || '').grey;
-		    s.host = s.host.grey;
-	    }
-	    return [s.host, (s.jobId || ''), s.stateColor];
+      if (_.startsWith(s.jobId, jobId)) {
+        s.stateColor = stateColor(s.state);
+      } else {
+        s.stateColor = (s.state || '').grey;
+        s.jobId =(s.jobId || '').grey;
+        s.host = s.host.grey;
+      }
+      return [s.host, (s.jobId || ''), s.stateColor];
     }), ['Host','Job ID','State']);
 
-	  var finished = _.filter(lastResult.hostStatuses, s => _.startsWith(s.jobId, jobId) && s.state === "RUNNING");
-	  if (finished.length >= lastResult.hostStatuses.length) {
-	    return cb();
-	  }
+    var finished = _.filter(lastResult.hostStatuses, s => _.startsWith(s.jobId, jobId) && s.state === "RUNNING");
+    if (finished.length >= lastResult.hostStatuses.length) {
+      return cb();
+    }
   }
   var wait = lastResult ? 1500 : 0;
   setTimeout(function () {
-	  execSalt('xpr-deploy.status',[group], ca, token, function (err, result) {
-	    if (err) return cb(err);
-	    clearLines(lastResult ? 7 : 0);
-				waitForDeploy(jobId, group, ca, token, result, cb);});
+    execSalt('xpr-deploy.status',[group], ca, token, function (err, result) {
+      if (err) return cb(err);
+      clearLines(lastResult ? 7 : 0);
+      waitForDeploy(jobId, group, ca, token, result, cb);});
   }, wait);
 }
 
 function clearLines(n) {
   _.times(n, function () {
-	  readline.clearLine(process.stdout, 0);
-	  readline.moveCursor(process.stdout, 0, -1);
+    readline.clearLine(process.stdout, 0);
+    readline.moveCursor(process.stdout, 0, -1);
   });
   readline.clearLine(process.stdout, 0);
   readline.cursorTo(process.stdout, 0);
