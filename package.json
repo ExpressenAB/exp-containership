@@ -1,6 +1,6 @@
 {
   "name": "exp-containership",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Build and deploy applications as containers.",
   "author": "AB Kvällstidningen Expressen",
   "license": {
