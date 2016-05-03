@@ -9,7 +9,7 @@ var _ = require('lodash'),
     program = require('commander'),
     pkg = require('../package.json'),
     async = require('async'),
-    messages = require('./messages.js'),
+    readline = require("readline"),
     heliosJob = require('./helios-job.json'),
     exec = require('child_process').exec,
     Spinner = require('cli-spinner').Spinner,
@@ -129,9 +129,7 @@ function saveAuthToken(state, cb) {
 }
 
 function execSalt(saltFunction, saltArgs, ca, token, cb) {
-  var message = messages.randomMessage();
-  var spinner = new Spinner('Please wait -- ' + message +
-        (_.endsWith(message, '?') || _.endsWith(message, '!') ? ' %s' : '... %s'));
+    var spinner = new Spinner('Executing "' + saltFunction + '" (Ctrl-C to abort)');
   var agentOptions = {};
   if (!program.insecure && process.env['npm_package_config_exp_containership_insecure'] !== 'true') {
     agentOptions.ca = ca;
@@ -381,20 +379,53 @@ program
       var jobDef = new Buffer(JSON.stringify(job)).toString('hex');
       var saltArgs = [app, program.environment, rev, jobDef, image, group, program.user];
       logVerbose("Job def: ", JSON.stringify(job, null, 2));
-      execSalt('xpr-deploy.deploy', saltArgs, state.ca, state.token, function (err, result) {
+      execSalt('xpr-deploy.deploy_async', saltArgs, state.ca, state.token, function (err, result) {
         if (err) return cb(err);
-        result.status = stateColor(result.status);
-        printTable(_.pick(result, ["duration", "status"]));
-        execSalt('xpr-deploy.status',[group], state.ca, state.token, function (err, result) {
-          if (err) return cb(err);
-          printTable(_.map(result.hostStatuses, function (s) {
-            return [s.host, (s.jobId || ''), stateColor(s.state)];
-          }), ['Host','Job ID','State']);
-          return cb(null, state);
-        });
+        printTable({result: stateColor(result.status)});
+        if (result.status === "OK") {
+          waitForDeploy(jobId, group, state.ca, state.token, undefined, cb);
+        } else {
+          cb();
+        }
       });
     });
   });
+
+function waitForDeploy(jobId, group, ca, token, lastResult, cb) {
+  if (lastResult) {
+    printTable(_.map(lastResult.hostStatuses, function (s) {
+      if (_.startsWith(s.jobId, jobId)) {
+        s.stateColor = stateColor(s.state);
+      } else {
+        s.stateColor = (s.state || '').grey;
+        s.jobId =(s.jobId || '').grey;
+        s.host = s.host.grey;
+      }
+      return [s.host, (s.jobId || ''), s.stateColor];
+    }), ['Host','Job ID','State']);
+
+    var finished = _.filter(lastResult.hostStatuses, s => _.startsWith(s.jobId, jobId) && s.state === "RUNNING");
+    if (finished.length >= lastResult.hostStatuses.length) {
+      return cb();
+    }
+  }
+  var wait = lastResult ? 1500 : 0;
+  setTimeout(function () {
+    execSalt('xpr-deploy.status',[group], ca, token, function (err, result) {
+      if (err) return cb(err);
+      clearLines(lastResult ? 7 : 0);
+      waitForDeploy(jobId, group, ca, token, result, cb);});
+  }, wait);
+}
+
+function clearLines(n) {
+  _.times(n, function () {
+    readline.clearLine(process.stdout, 0);
+    readline.moveCursor(process.stdout, 0, -1);
+  });
+  readline.clearLine(process.stdout, 0);
+  readline.cursorTo(process.stdout, 0);
+}
 
 program
   .command('undeploy [revision] [app] [group]')
