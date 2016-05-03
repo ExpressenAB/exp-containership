@@ -404,7 +404,9 @@ function waitForDeploy(jobId, group, ca, token, lastResult, cb) {
       return [s.host, (s.jobId || ''), s.stateColor];
     }), ['Host','Job ID','State']);
 
-    var finished = _.filter(lastResult.hostStatuses, s => _.startsWith(s.jobId, jobId) && s.state === "RUNNING");
+    var finished = _.filter(lastResult.hostStatuses, function(s) {
+      return _.startsWith(s.jobId, jobId) && s.state === "RUNNING";
+    });
     if (finished.length >= lastResult.hostStatuses.length) {
       return cb();
     }
