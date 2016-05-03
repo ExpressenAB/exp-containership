@@ -415,7 +415,7 @@ function waitForDeploy(jobId, group, ca, token, lastResult, cb) {
   setTimeout(function () {
     execSalt('xpr-deploy.status',[group], ca, token, function (err, result) {
       if (err) return cb(err);
-      clearLines(lastResult ? 7 : 0);
+      clearLines(lastResult ? 3 + 2 * lastResult.hostStatuses.length : 0);
       waitForDeploy(jobId, group, ca, token, result, cb);});
   }, wait);
 }
