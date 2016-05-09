@@ -184,7 +184,7 @@ $ npm run xpr:logs production xpr-p-app101
 
 ## OSX Docker
 
-If you are using the osx docker beta, set the following envirnment variable and exp-containership should abide.
+If you are using the [OSX Docker beta](https://beta.docker.com/), set the following environment variable and exp-containership should abide.
 
 ```
 EXP_OSX_DOCKER=true
