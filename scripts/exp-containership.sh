@@ -14,6 +14,10 @@ open=0
 open_environment="development"
 exec=0
 
+if [ "$EXP_OSX_DOCKER" == "true" ]; then
+   kernel=Linux
+fi
+
 if [ "$1" == "init" ]; then
     init=1
 elif [ "$1" == "reset" ]; then
@@ -68,36 +72,38 @@ fi
 # init
 if [ $init == 1 ]; then
   if (which docker-machine >/dev/null); then
+    if [ "${kernel}" != "Linux" ]; then
       ls=$(docker-machine ls | grep "${machine_name}") || true
       home="/Volumes/Data/Users"
       if [ -z "${ls}" ]; then
-          echo "Creating docker machine..."
-          docker-machine create \
-            --driver virtualbox \
-            --virtualbox-cpu-count "4" \
-            --virtualbox-memory "2048" \
-            --virtualbox-disk-size "100000" \
-            "${machine_name}" >/dev/null
-          if [ -e "${home}" ]; then
-            docker-machine stop "${machine_name}" >/dev/null
-            VBoxManage sharedfolder add "${machine_name}" \
-              --name exp --hostpath $home --automount > /dev/null 2>&1
-            VBoxManage setextradata "${machine_name}" \
-              VBoxInternal2/SharedFoldersEnableSymlinksCreate/exp 1
-            docker-machine start "${machine_name}" >/dev/null
-          fi
-      elif !(echo "${ls}" | grep "Running" >/dev/null); then
-          echo "Starting docker machine..."
+        echo "Creating docker machine..."
+        docker-machine create \
+                       --driver virtualbox \
+                       --virtualbox-cpu-count "4" \
+                       --virtualbox-memory "2048" \
+                       --virtualbox-disk-size "100000" \
+                       "${machine_name}" >/dev/null
+        if [ -e "${home}" ]; then
+          docker-machine stop "${machine_name}" >/dev/null
+          VBoxManage sharedfolder add "${machine_name}" \
+                     --name exp --hostpath $home --automount > /dev/null 2>&1
+          VBoxManage setextradata "${machine_name}" \
+                     VBoxInternal2/SharedFoldersEnableSymlinksCreate/exp 1
           docker-machine start "${machine_name}" >/dev/null
+        fi
+      elif !(echo "${ls}" | grep "Running" >/dev/null); then
+        echo "Starting docker machine..."
+        docker-machine start "${machine_name}" >/dev/null
       fi
       if [ -e "${home}" ]; then
         docker-machine ssh "${machine_name}" \
-          "sudo mkdir -p \"${home}\" && sudo mount -t vboxsf -o uid=1000 -o gid=50 exp \"${home}\""
+                       "sudo mkdir -p \"${home}\" && sudo mount -t vboxsf -o uid=1000 -o gid=50 exp \"${home}\""
       fi
       eval $(docker-machine env --shell bash "${machine_name}")
+    fi
   elif [ "${kernel}" != "Linux" ]; then
     echo "Need Docker Machine to proceed, please install Docker Toolbox and run this script again"
-    open "https://github.com/docker/toolbox/releases/tag/v1.8.3"
+    open "https://www.docker.com/products/docker-toolbox"
     exit 1
   fi
 

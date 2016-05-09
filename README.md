@@ -182,6 +182,16 @@ To view all logs on a specific server:
 $ npm run xpr:logs production xpr-p-app101
 ```
 
+## Log tailing
+
+OSX Docker
+
+If you are using the osx docker beta, set the following envirnment variable and exp-containership should abide.
+
+```
+EXP_OSX_DOCKER=true
+```
+
 # Issues
 
 ## Certificate issue
