@@ -182,6 +182,14 @@ To view all logs on a specific server:
 $ npm run xpr:logs production xpr-p-app101
 ```
 
+## Restarting a node
+
+The restart command requires both environment and host. (To see available hosts issue a "xpr:status" command).
+
+```
+$npm run xpr:restart production xpr-p-app102
+```
+
 ## OSX Docker
 
 If you are using the [OSX Docker beta](https://beta.docker.com/), set the following environment variable and exp-containership should abide.
