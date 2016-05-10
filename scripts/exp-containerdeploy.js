@@ -451,6 +451,9 @@ program
   .action(function (env, node) {
     tasks.push(function (state, cb) {
       app = ensure_app(undefined);
+      if (!env || !node) {
+        errExit("Environment and host required.");
+      }
       execSalt('xpr-deploy.restart', [app, env, node], state.ca, state.token, function (err, status) {
         if (err) return cb(err);
         if (status["error"]) {
