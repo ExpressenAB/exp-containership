@@ -128,11 +128,11 @@ function saveAuthToken(state, cb) {
   });
 }
 
-function execSalt(saltFunction, saltArgs, ca, token, cb) {
+function execSalt(saltFunction, saltArgs, state, cb) {
     var spinner = new Spinner('Executing "' + saltFunction + '" (Ctrl-C to abort)');
   var agentOptions = {};
   if (!program.insecure && process.env['npm_package_config_exp_containership_insecure'] !== 'true') {
-    agentOptions.ca = ca;
+    agentOptions.ca = state.ca;
   }
   spinner.start();
   var req = {
@@ -140,7 +140,7 @@ function execSalt(saltFunction, saltArgs, ca, token, cb) {
     url: program.api,
     agentOptions: agentOptions,
     headers: {
-      "X-Auth-Token": token,
+      "X-Auth-Token": state.token,
       "Accept": "application/json"
     },
     json: {
@@ -162,7 +162,8 @@ function execSalt(saltFunction, saltArgs, ca, token, cb) {
       async.waterfall([deleteAuthToken, loadCaCert, login, saveAuthToken],
                       function (err, result) {
                         if (err) return cb(err);
-                        execSalt(saltFunction, saltArgs, ca, result.token, cb);
+                        state.token = result.token;
+                        execSalt(saltFunction, saltArgs, state, cb);
                       });
     } else {
       cb(new Error('Unknown error returned by Salt API'));
@@ -259,7 +260,7 @@ program
   .action(function (group) {
     group = ensure_group(null, group);
     tasks.push(function (state, cb) {
-      execSalt('xpr-deploy.status',[group], state.ca, state.token, function (err, result) {
+      execSalt('xpr-deploy.status',[group], state, function (err, result) {
         if (err) return cb(err);
         printTable({
           Status: result.status,
@@ -281,7 +282,7 @@ program
     group = ensure_group(app, null);
     size = ensure_deployment_size();
     tasks.push(function (state, cb) {
-      execSalt('xpr-deploy.consul_config',[app, program.environment], state.ca, state.token, function (err, result) {
+      execSalt('xpr-deploy.consul_config',[app, program.environment], state, function (err, result) {
         if (err) return cb(err);
         console.log("Consul config:");
         result = JSON.parse(result);
@@ -289,7 +290,7 @@ program
           return [v];
         }), ['Key','Value']);
       });
-      execSalt('xpr-deploy.create_deployment_group',[group, program.environment, size], state.ca, state.token, function (err, result) {
+      execSalt('xpr-deploy.create_deployment_group',[group, program.environment, size], state, function (err, result) {
         if (err) return cb(err);
         console.log("Helios deployment group:");
         var tbl = {};
@@ -309,7 +310,7 @@ program
       app = app + ':' + rev;
     }
     tasks.push(function (state, cb) {
-      execSalt('xpr-deploy.jobs', [app], state.ca, state.token, function (err, jobs) {
+      execSalt('xpr-deploy.jobs', [app], state, function (err, jobs) {
         if (err) return cb(err);
         var table = _.map(jobs, function (job) {
           var jobEnv =  _.map(job.env, function (v, e) {return e.yellow + '=' + v;}).join('\n');
@@ -379,11 +380,11 @@ program
       var jobDef = new Buffer(JSON.stringify(job)).toString('hex');
       var saltArgs = [app, program.environment, rev, jobDef, image, group, program.user];
       logVerbose("Job def: ", JSON.stringify(job, null, 2));
-      execSalt('xpr-deploy.deploy_async', saltArgs, state.ca, state.token, function (err, result) {
+      execSalt('xpr-deploy.deploy_async', saltArgs, state, function (err, result) {
         if (err) return cb(err);
         printTable({result: stateColor(result.status)});
         if (result.status === "OK") {
-          waitForDeploy(jobId, group, state.ca, state.token, undefined, cb);
+          waitForDeploy(jobId, group, state, undefined, cb);
         } else {
           cb();
         }
@@ -391,7 +392,7 @@ program
     });
   });
 
-function waitForDeploy(jobId, group, ca, token, lastResult, cb) {
+function waitForDeploy(jobId, group, state, lastResult, cb) {
   if (lastResult) {
     printTable(_.map(lastResult.hostStatuses, function (s) {
       if (_.startsWith(s.jobId, jobId)) {
@@ -413,10 +414,10 @@ function waitForDeploy(jobId, group, ca, token, lastResult, cb) {
   }
   var wait = lastResult ? 1500 : 0;
   setTimeout(function () {
-    execSalt('xpr-deploy.status',[group], ca, token, function (err, result) {
+    execSalt('xpr-deploy.status',[group], state, function (err, result) {
       if (err) return cb(err);
       clearLines(lastResult ? 3 + 2 * lastResult.hostStatuses.length : 0);
-      waitForDeploy(jobId, group, ca, token, result, cb);});
+      waitForDeploy(jobId, group, state, result, cb);});
   }, wait);
 }
 
@@ -437,7 +438,7 @@ program
       app = ensure_app(app);
       group = ensure_group(app, group);
       rev = rev || state.revision;
-      execSalt('xpr-deploy.undeploy', [group, program.user], state.ca, state.token, function (err) {
+      execSalt('xpr-deploy.undeploy', [group, program.user], state, function (err) {
         if (err) return cb(err);
         console.log("Undeploy finished. Reply from backend was: GR8 SUCCESS");
         cb(null, state);
@@ -454,7 +455,7 @@ program
       if (!env || !node) {
         errExit("Environment and host required.");
       }
-      execSalt('xpr-deploy.restart', [app, env, node], state.ca, state.token, function (err, status) {
+      execSalt('xpr-deploy.restart', [app, env, node], state, function (err, status) {
         if (err) return cb(err);
         if (status["error"]) {
           console.log("Restart failed. Reply from backend was: " + status["error"]);
@@ -480,7 +481,7 @@ program
   .parse(process.argv);
 
 if (process.argv.length <= 2) {
-  return program.help();
+  program.help();
 } else {
   async.waterfall(tasks, function (err, state) {
     if (err) {
