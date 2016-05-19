@@ -9,6 +9,6 @@ web:
     - NODE_ENV=development
     - DEV_APP_ENABLED=true
   volumes:
-    - ./:/exp-container/app
+    - ./:/exp-container/app:Z
     # Link node modules with host fs to avoid uneccessary rebuild after container restart
-    - ./tmp/docker_node_modules:/exp-container/app/node_modules
+    - ./tmp/docker_node_modules:/exp-container/app/node_modules:Z
