@@ -5,7 +5,7 @@ publishedrevision="$(exp-containerdeploy status -e \"${environment}\" | grep 'Jo
 
 echo "The published revision for environment '${environment}' is ${publishedrevision}"
 
-git log \
+git --no-pager log \
       --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' \
       --abbrev-commit \
       --date=relative \
