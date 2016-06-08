@@ -1,7 +1,21 @@
 # Passless ssh setup
 
 For a swift and pain-free ssh experience, we recommend that you setup passwordless login using private/public keys.
-Feel free to use this script to automate the process
+
+## Step 1: .ssh config
+
+Make sure you have the correct default username for the servers you want to access.
+Edit or create the file ```~/.ssh/confg``` to accomlish this. An example:
+
+```
+Host xpr-*
+User ad\firstname.lastname
+```
+
+## Step2: run magic script
+
+Save this script on you computer as "passless.sh":
+
 
 ```bash
 #!/bin/sh
@@ -41,13 +55,13 @@ fi
 { eval "$GET_ID" ; } | ssh $1 "umask 077; test -d .ssh || mkdir .ssh ; cat >> .ssh/authorized_keys; test -x /sbin/restorecon && /sbin/restorecon .ssh .ssh/authorized_keys" || exit 1
 ```
 
-## Usage
-
-Save the script locally as "passless.sh" and the use it to enable passwordless login on servers you access.
+And the run it for all servers you want to access
 For example:
 
 ```
-$ for n in {1..6}; do sh passless.sh "AD\\your.username@xpr-p-app10${n}.sth.basefarm.net" ; done
-$ for n in {1..2}; do sh passless.sh "AD\\your.username@xpr-t-test10${n}.sth.basefarm.net" ; done
-
+$ for n in {1..6}; do sh passless.sh "xpr-p-app10${n}.sth.basefarm.net" ; done
+$ for n in {1..2}; do sh passless.sh "xpr-t-test10${n}.sth.basefarm.net" ; done
 ```
+
+Done! You should no longer be prompted for a password and be automatically logged in.
+
