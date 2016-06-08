@@ -2,7 +2,7 @@
 
 For a swift and pain-free ssh experience, we recommend that you setup passwordless login using private/public keys.
 
-## Step 1: .ssh config
+#### Step 1: .ssh config
 
 Make sure you have the correct default username for the servers you want to access.
 Edit or create the file ```~/.ssh/confg``` to contain something like this:
@@ -12,7 +12,7 @@ Host xpr-*
 User ad\your.name
 ```
 
-## Step2: run magic script
+#### Step 2: run magic script
 
 Save this script on you computer as "passless.sh":
 
