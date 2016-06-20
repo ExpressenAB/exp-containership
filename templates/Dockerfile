@@ -1,4 +1,4 @@
-FROM exp-docker.repo.dex.nu/nodejs:0.12
+FROM exp-docker.repo.dex.nu/nodejs:6
 MAINTAINER Infra team Expressen <infra@expressen.se>
 
 ENV NODE_ENV=development
