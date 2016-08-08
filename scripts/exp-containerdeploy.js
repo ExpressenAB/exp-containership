@@ -369,10 +369,10 @@ program
           DEPLOYMENT_DATE: new Date()
         },
         volumes: {
-          "/exp-container/logs:rw" : path.join('/var/log/containers', program.environment, app),
+          "/exp-container/logs:rw" : path.join('/var/lib/containers/log', program.environment, app),
           "/exp-container/data:rw" : path.join('/var/lib/containers', program.environment, app),
-          "/root/.pm2/logs:rw" : path.join('/var/log/containers', program.environment, app),
-          "/home/web/.pm2/logs:rw" : path.join('/var/log/containers', program.environment, app)
+          "/root/.pm2/logs:rw" : path.join('/var/lib/containers/log', program.environment, app),
+          "/home/web/.pm2/logs:rw" : path.join('/var/lib/containers/log', program.environment, app)
         }
       }, state.job);
       var jobId = jobName(app, program.environment, rev);
