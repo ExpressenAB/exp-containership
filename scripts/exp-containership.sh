@@ -139,7 +139,7 @@ fi
 
 if [ $push == 1 ]; then
     echo "Tagging and pushing $npm_package_name:$_REV container"
-    STATUS_CODE=$(curl -sSS --output /dev/stderr --write-out "%{http_code}" https://${npm_package_config_exp_containership_repo:-exp-docker.repo.dex.nu}/v2/$npm_package_name/manifests/$_REV 2>/dev/null)
+    STATUS_CODE=$(curl -sSk --output /dev/stderr --write-out "%{http_code}" https://${npm_package_config_exp_containership_repo:-exp-docker.repo.dex.nu}/v2/$npm_package_name/manifests/$_REV 2>/dev/null)
     if [ "${STATUS_CODE}" -ne "200" ]; then
       docker tag $npm_package_name:$_REV ${npm_package_config_exp_containership_repo:-exp-docker.repo.dex.nu}/$npm_package_name:$_REV
       docker push ${npm_package_config_exp_containership_repo:-exp-docker.repo.dex.nu}/$npm_package_name:$_REV
