@@ -54,7 +54,7 @@ fi
 if [ $reset == 1 ]; then
     # node_modules directory linked into dev containers by docker-compose, should
     # be removed during reset as installed version can sometimes become stale
-    echo "Removing tmp node_modules directorty..."
+    echo "Removing tmp node_modules directory..."
     rm -rf tmp/node_modules
     rm -rf tmp/docker_node_modules
 
