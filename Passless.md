@@ -5,7 +5,7 @@ For a swift and pain-free ssh experience, we recommend that you setup passwordle
 #### Step 1: .ssh config
 
 Make sure you have the correct default username for the servers you want to access.
-Edit or create the file ```~/.ssh/confg``` to contain something like this:
+Edit or create the file ```~/.ssh/config``` to contain something like this:
 
 ```
 Host xpr-*
