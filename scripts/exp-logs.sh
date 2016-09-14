@@ -13,7 +13,10 @@ NODES=${NODES:-$(curl -Sss "$URL" | tr ',' '\n' | grep Node | sed 's/.*\:\"\(.*\
 
 for NODE in $NODES
 do
-  ssh ${NODE}.sth.basefarm.net "ls /var/log/containers/$ENV/$SERVICE/*.log | grep -v access | xargs tail -F " &
+  ssh ${NODE}.sth.basefarm.net \
+      "ls /var/log/containers/$ENV/$SERVICE/*.log \
+          /var/lib/containers/log/$ENV/$SERVICE/*.log | \
+       grep -v access | xargs tail -F " &
   PIDS="$PIDS $!"
 done
 
