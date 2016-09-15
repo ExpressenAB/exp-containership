@@ -2,7 +2,6 @@
 
 environment="${1:-production}"
 exp-containerdeploy login
-"$(exp-containerdeploy status -e \"${environment}\" | grep 'Job Id' | cut -f2 -d ':')"
 publishedrevision="$(exp-containerdeploy status -e \"${environment}\" | grep 'Job Id' | cut -f2 -d ':')"
 
 echo "The published revision for environment '${environment}' is ${publishedrevision}"
