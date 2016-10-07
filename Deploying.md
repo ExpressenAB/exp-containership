@@ -135,7 +135,7 @@ $ npm run xpr:status production
 Ssh to a server and check it out. For example, tail the logs: 
 ```
 $ ssh xpr-p-app105.sth.basefarm.net -l ad\\[your username]
-xpr-p-app105> tail -F /var/log/containers/production/ursula/*
+xpr-p-app105> tail -F /var/lib/containers/log/production/ursula/*
 ```
 
 While still logged in you can go deeper and attach to the docker container with a shell.
